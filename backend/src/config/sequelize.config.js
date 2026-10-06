@@ -5,10 +5,10 @@
  * The application itself does not use this file - it connects through
  * `src/config/database.js`. Both read the same `src/config/env.js` settings.
  */
+
 const env = require('./env');
 
 const connectionTimeoutMillis = env.DB_CONNECTION_TIMEOUT_MS || 30000;
-
 /**
  * Optional self-signed CA (Aiven's `ca.pem`). When present we verify the chain
  * ourselves and require `rejectUnauthorized`; otherwise the flag comes from

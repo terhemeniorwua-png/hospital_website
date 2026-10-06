@@ -33,6 +33,8 @@ const hospitalNumberPrefix = env.HOSPITAL_NUMBER_PREFIX;
  * `nextUniqueHospitalNumber`.
  */
 async function nextHospitalNumber(year = env.HOSPITAL_NUMBER_YEAR, options = {}) {
+console.error('hospital number first candidate:', first, 'prefix:', prefix);
+
   const prefix = `${hospitalNumberPrefix}-${year}-`;
   const last = await Patient.findOne({
     where: { hospitalNumber: { [Op.like]: `${prefix}%` } },
@@ -51,12 +53,23 @@ async function nextHospitalNumber(year = env.HOSPITAL_NUMBER_YEAR, options = {})
  * case of two registrations racing for the same number.
  */
 async function nextUniqueHospitalNumber(options = {}, attempts = 5) {
-  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+
+
+  const year = env.HOSPITAL_NUMBER_YEAR;
+  const prefix = `${hospitalNumberPrefix}-${year}-`;
+  const first = await nextHospitalNumber(year, options);
+  const firstSequence = Number.parseInt(first.slice(prefix.length), 10);
+
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const candidate = `${prefix}${pad(firstSequence + attempt)}`;
     // eslint-disable-next-line no-await-in-loop
-    const candidate = await nextHospitalNumber(env.HOSPITAL_NUMBER_YEAR, options);
-    // eslint-disable-next-line no-await-in-loop
-    const taken = await Patient.findOne({ where: { hospitalNumber: candidate }, attributes: ['id'], ...options });
+    const taken = await Patient.findOne({
+      where: { hospitalNumber: candidate },
+      attributes: ['id'],
+      transaction: options.transaction,
+    });
     if (!taken) return candidate;
+    console.error('hospital number already taken:', candidate);
   }
   throw new Error('Unable to allocate a unique hospital number');
 }

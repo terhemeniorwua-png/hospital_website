@@ -6,7 +6,8 @@ const createApp = require('../src/app');
  * every request below is rejected by authentication or validation before a
  * service is called.
  */
-let app;
+
+  let app;
 
 beforeAll(() => {
   app = createApp();
