@@ -32,6 +32,7 @@ const hospitalNumberPrefix = env.HOSPITAL_NUMBER_PREFIX;
  * index on `patients.hospital_number` is the final guard; callers retry through
  * `nextUniqueHospitalNumber`.
  */
+
 async function nextHospitalNumber(year = env.HOSPITAL_NUMBER_YEAR, options = {}) {
 console.error('hospital number first candidate:', first, 'prefix:', prefix);
 
