@@ -4943,8 +4943,8 @@ const config = {
         city: 'Lagos',
         country: 'Nigeria'
     },
-    /** localStorage key holding the persisted session tokens. */ tokenStorageKey: 'sa.auth.tokens',
-    /** Window in which concurrent 401s share a single refresh call. */ refreshLockMs: 8000,
+    /** localStorage key holding the persisted session tokens. */ tokenStorageKey: process.env.TOKENSTORAGEKEY,
+    /** Window in which concurrent 401s share a single refresh call. */ refreshLockMs: process.env.REFRESHhLOCKMS,
     /** The backend rejects `limit` above 100 (validated by common.pagination). */ maxPageSize: 100
 };
 const __TURBOPACK__default__export__ = config;

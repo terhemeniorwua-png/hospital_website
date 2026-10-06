@@ -7110,8 +7110,8 @@ const config = {
         city: 'Lagos',
         country: 'Nigeria'
     },
-    /** localStorage key holding the persisted session tokens. */ tokenStorageKey: 'sa.auth.tokens',
-    /** Window in which concurrent 401s share a single refresh call. */ refreshLockMs: 8000,
+    /** localStorage key holding the persisted session tokens. */ tokenStorageKey: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.TOKENSTORAGEKEY,
+    /** Window in which concurrent 401s share a single refresh call. */ refreshLockMs: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.REFRESHhLOCKMS,
     /** The backend rejects `limit` above 100 (validated by common.pagination). */ maxPageSize: 100
 };
 const __TURBOPACK__default__export__ = config;
