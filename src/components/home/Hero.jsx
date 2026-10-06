@@ -55,7 +55,7 @@ export default function Hero() {
 
             <motion.h1
               {...reveal(0.08)}
-              className="mt-6 text-4xl leading-[1.08] font-bold tracking-tight text-white text-balance sm:text-5xl lg:text-6xl"
+              className="mtext-4xl leading-[1.08] font-bold tracking-tight text-white text-balance sm:text-5xl lg:text-6xl"
             >
               {config.hospital.name}
             </motion.h1>
