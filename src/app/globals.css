@@ -1,0 +1,301 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ *
+ * Design tokens
+ * Healthcare palette: calm neutrals, one primary blue, semantic colours
+ * reserved for genuine clinical meaning (status, urgency, success).
+ * ------------------------------------------------------------------ */
+@theme {
+  --color-canvas: #f8fafc;
+  --color-surface: #ffffff;
+  --color-ink: #0f172a;
+  --color-muted: #64748b;
+  --color-line: #e2e8f0;
+
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+
+  --color-success-50: #ecfdf5;
+  --color-success-100: #d1fae5;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+
+  --color-teal-50: #f0fdfa;
+  --color-teal-100: #ccfbf1;
+  --color-teal-600: #0d9488;
+  --color-teal-700: #0f766e;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 4px 16px -4px rgb(15 23 42 / 0.08);
+  --shadow-lift: 0 2px 4px rgb(15 23 42 / 0.04), 0 12px 32px -8px rgb(15 23 42 / 0.14);
+  --shadow-panel: 0 24px 64px -24px rgb(15 23 42 / 0.22);
+
+  --radius-xs: 0.375rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ------------------------------------------------------------------ *
+ * Base
+ * ------------------------------------------------------------------ */
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: var(--color-primary-100);
+  color: var(--color-primary-900);
+}
+
+/* Visible, consistent focus ring for keyboard users. */
+:focus-visible {
+  outline: 2px solid var(--color-primary-600);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ------------------------------------------------------------------ *
+ * Motion primitives
+ * Animation is opt-in through these utilities and components; `motion-safe`
+ * variants keep everything still for users who ask for reduced motion.
+ * ------------------------------------------------------------------ */
+@keyframes sa-fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes sa-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sa-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes sa-pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(220 38 38 / 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgb(220 38 38 / 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(220 38 38 / 0);
+  }
+}
+
+@keyframes sa-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.sa-fade-up {
+  animation: sa-fade-up 0.7s var(--ease-out-soft) both;
+}
+
+.sa-fade-in {
+  animation: sa-fade-in 0.5s var(--ease-out-soft) both;
+}
+
+.sa-float {
+  animation: sa-float 6s ease-in-out infinite;
+}
+
+.sa-pulse-ring {
+  animation: sa-pulse-ring 2.4s ease-out infinite;
+}
+
+.sa-marquee {
+  animation: marquee 38s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .sa-fade-up,
+  .sa-fade-in,
+  .sa-float,
+  .sa-marquee,
+  .sa-pulse-ring {
+    animation: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Skeletons
+ * ------------------------------------------------------------------ */
+.sa-skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-line);
+  border-radius: var(--radius-sm);
+}
+
+.sa-skeleton::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  transform: translateX(-100%);
+  background-image: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.65), transparent);
+  animation: sa-shimmer 1.6s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sa-skeleton::after {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Utilities
+ * ------------------------------------------------------------------ */
+.sa-container {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 80rem;
+  padding-inline: 1.25rem;
+}
+
+@media (min-width: 1024px) {
+  .sa-container {
+    padding-inline: 2rem;
+  }
+}
+
+.sa-section {
+  padding-block: 4rem;
+}
+
+@media (min-width: 768px) {
+  .sa-section {
+    padding-block: 5.5rem;
+  }
+}
+
+.sa-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-primary-700);
+}
+
+.sa-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to right, rgb(15 23 42 / 0.82) 0%, rgb(15 23 42 / 0.55) 45%, rgb(15 23 42 / 0.3) 100%);
+}
+
+/* Dark-on-image text always needs this treatment. */
+.sa-on-image {
+  color: #ffffff;
+  text-shadow: 0 1px 12px rgb(15 23 42 / 0.35);
+}
+
+.sa-prose-body p {
+  margin-block: 0.75rem;
+  line-height: 1.75;
+}
+
+.sa-scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
+.sa-scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.sa-scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: var(--color-line);
+  border-radius: 999px;
+}
+
+.sa-hide-scrollbar {
+  scrollbar-width: none;
+}
+
+.sa-hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
