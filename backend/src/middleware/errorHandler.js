@@ -28,6 +28,9 @@ function normalise(error) {
   }
 
   if (error instanceof ForeignKeyConstraintError) {
+    if (err.name === 'SequelizeForeignKeyConstraintError') {
+  console.error('FK violation:', err.table, err.index, JSON.stringify(err.fields), err.parent && err.parent.detail);
+}
     return AppError.badRequest('Referenced record does not exist or is still in use', {
       errors: [{ field: 'reference', message: error.message }],
     });
