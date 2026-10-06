@@ -116,7 +116,7 @@ async function registerPatient({ payload, req }) {
   return sequelizeTransaction(async (transaction) => {
     const patient = await Patient.create(
       {
-        hospitalNumber: await nextUniqueHospitalNumber({}, { transaction }),
+        hospitalNumber: await nextUniqueHospitalNumber({ transaction }),
         firstName: payload.firstName,
         lastName: payload.lastName,
         middleName: payload.middleName ?? null,

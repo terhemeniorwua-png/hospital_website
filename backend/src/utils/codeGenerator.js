@@ -51,20 +51,23 @@ async function nextHospitalNumber(year = env.HOSPITAL_NUMBER_YEAR, options = {})
  * `nextHospitalNumber` with a bounded number of attempts, for the (very rare)
  * case of two registrations racing for the same number.
  */
+
 async function nextUniqueHospitalNumber(options = {}, attempts = 5) {
+  const maxAttempts = Number.isInteger(attempts) && attempts > 0 ? attempts : 5;
+  const safeOptions = options && typeof options === 'object' ? options : {};
   const year = env.HOSPITAL_NUMBER_YEAR;
   const prefix = `${hospitalNumberPrefix}-${year}-`;
-  const first = await nextHospitalNumber(year, options);
+  const first = await nextHospitalNumber(year, safeOptions);
   const firstSequence = Number.parseInt(first.slice(prefix.length), 10) || 1;
-  console.error('hospital number first candidate:', first, 'prefix:', prefix);
+  console.error('hospital number first candidate:', first, 'attempts:', maxAttempts);
 
-  for (let attempt = 0; attempt < attempts; attempt += 1) {
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
     const candidate = `${prefix}${pad(firstSequence + attempt)}`;
     // eslint-disable-next-line no-await-in-loop
     const taken = await Patient.findOne({
       where: { hospitalNumber: candidate },
       attributes: ['id'],
-      transaction: options.transaction,
+      transaction: safeOptions.transaction,
     });
     if (!taken) return candidate;
     console.error('hospital number already taken:', candidate);
