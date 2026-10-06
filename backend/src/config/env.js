@@ -74,6 +74,25 @@ function parseList(value, fallback = []) {
     .filter(Boolean);
 }
 
+/**
+ * Allowed browser origins for CORS: `CORS_ORIGINS` plus `CLIENT_URL`.
+ *
+ * Each comma-separated entry is trimmed, stripped of trailing slashes and
+ * empty entries dropped, so `https://site.vercel.app/` and
+ * `https://site.vercel.app` are treated as the same origin. CLIENT_URL is
+ * always added when it is set, because that is the origin the site is
+ * genuinely served from; without it a single mis-set CORS_ORIGINS locks the
+ * frontend out entirely.
+ */
+function parseOrigins(value) {
+  const strip = (item) => item.replace(/\/+$/, '');
+  const fromList = parseList(value).map(strip).filter(Boolean);
+  const clientUrl = strip(String(process.env.CLIENT_URL || '').trim());
+  const origins = [...new Set(clientUrl ? [...fromList, clientUrl] : fromList)];
+  // Preserve the original localhost default when nothing is configured.
+  return origins.length ? origins : ['http://localhost:3000'];
+}
+
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const isProduction = NODE_ENV === 'production';
 
@@ -135,7 +154,7 @@ const env = {
   HOST: process.env.HOST || '0.0.0.0',
   API_PREFIX: process.env.API_PREFIX || '/api',
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:3000',
-  CORS_ORIGINS: parseList(process.env.CORS_ORIGINS, ['http://localhost:3000']),
+  CORS_ORIGINS: parseOrigins(process.env.CORS_ORIGINS),
 
   database,
   dbSource: database.databaseUrl

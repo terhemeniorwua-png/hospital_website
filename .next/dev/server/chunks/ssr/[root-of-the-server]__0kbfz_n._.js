@@ -4929,7 +4929,14 @@ __turbopack_context__.s([
  * of truth for where requests go; there is no hard-coded fallback to a database
  * or secret of any kind.
  */ const trimSlash = (value)=>String(value || '').replace(/\/+$/, '');
-const API_URL = trimSlash(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5100/api');
+const IS_PRODUCTION = ("TURBOPACK compile-time value", "development") === 'production';
+const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL;
+if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+;
+// Localhost is a development convenience only. In production with the variable
+// missing we deliberately fall back to '' (same-origin) instead of a URL that
+// can never be reached from the user's browser.
+const API_URL = trimSlash(NEXT_PUBLIC_API_URL || (("TURBOPACK compile-time falsy", 0) ? "TURBOPACK unreachable" : 'http://localhost:5100/api'));
 const config = {
     apiUrl: API_URL,
     socketUrl: trimSlash(process.env.NEXT_PUBLIC_SOCKET_URL || API_URL.replace(/\/api$/, '')),
@@ -4943,8 +4950,20 @@ const config = {
         city: 'Lagos',
         country: 'Nigeria'
     },
-    /** localStorage key holding the persisted session tokens. */ tokenStorageKey: process.env.TOKENSTORAGEKEY,
-    /** Window in which concurrent 401s share a single refresh call. */ refreshLockMs: process.env.REFRESHhLOCKMS,
+    /**
+   * localStorage key holding the persisted session tokens.
+   *
+   * Was `process.env.TOKENSTORAGEKEY`: not a NEXT_PUBLIC_ name, so Next.js
+   * replaces it with `undefined` in the browser bundle and the session was
+   * written under the literal key "undefined". This is an internal client
+   * constant rather than deployment configuration, so it is a literal.
+   */ tokenStorageKey: 'sa.auth.tokens',
+    /**
+   * Window in which concurrent 401s share a single refresh call.
+   *
+   * Was `process.env.REFRESHhLOCKMS` for the same reason (and the name is
+   * misspelt), which made the single-flight guard compare against `undefined`.
+   */ refreshLockMs: 8000,
     /** The backend rejects `limit` above 100 (validated by common.pagination). */ maxPageSize: 100
 };
 const __TURBOPACK__default__export__ = config;

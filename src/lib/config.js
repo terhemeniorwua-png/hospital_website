@@ -9,7 +9,23 @@
 
 const trimSlash = (value) => String(value || '').replace(/\/+$/, '');
 
-const API_URL = trimSlash(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5100/api');
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+if (!NEXT_PUBLIC_API_URL && IS_PRODUCTION) {
+  // console.error rather than throw: throwing here would fail `next build`,
+  // while staying silent would ship a bundle pointing at localhost.
+  console.error(
+    '[config] NEXT_PUBLIC_API_URL is not set in production. ' +
+      'Requests will be sent same-origin and the API will not be reached. ' +
+      'Set NEXT_PUBLIC_API_URL to your backend origin, e.g. https://YOUR-BACKEND.onrender.com/api',
+  );
+}
+
+// Localhost is a development convenience only. In production with the variable
+// missing we deliberately fall back to '' (same-origin) instead of a URL that
+// can never be reached from the user's browser.
+const API_URL = trimSlash(NEXT_PUBLIC_API_URL || (IS_PRODUCTION ? '' : 'http://localhost:5100/api'));
 
 export const config = {
   apiUrl: API_URL,
@@ -24,10 +40,22 @@ export const config = {
     city: 'Lagos',
     country: 'Nigeria',
   },
-  /** localStorage key holding the persisted session tokens. */
-  tokenStorageKey: process.env.TOKENSTORAGEKEY,
-  /** Window in which concurrent 401s share a single refresh call. */
-  refreshLockMs: process.env.REFRESHhLOCKMS,
+  /**
+   * localStorage key holding the persisted session tokens.
+   *
+   * Was `process.env.TOKENSTORAGEKEY`: not a NEXT_PUBLIC_ name, so Next.js
+   * replaces it with `undefined` in the browser bundle and the session was
+   * written under the literal key "undefined". This is an internal client
+   * constant rather than deployment configuration, so it is a literal.
+   */
+  tokenStorageKey: 'sa.auth.tokens',
+  /**
+   * Window in which concurrent 401s share a single refresh call.
+   *
+   * Was `process.env.REFRESHhLOCKMS` for the same reason (and the name is
+   * misspelt), which made the single-flight guard compare against `undefined`.
+   */
+  refreshLockMs: 8000,
   /** The backend rejects `limit` above 100 (validated by common.pagination). */
   maxPageSize: 100,
 };

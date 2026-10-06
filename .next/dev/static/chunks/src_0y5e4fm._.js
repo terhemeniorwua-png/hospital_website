@@ -7096,7 +7096,14 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$ne
  * of truth for where requests go; there is no hard-coded fallback to a database
  * or secret of any kind.
  */ const trimSlash = (value)=>String(value || '').replace(/\/+$/, '');
-const API_URL = trimSlash(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_API_URL || 'http://localhost:5100/api');
+const IS_PRODUCTION = ("TURBOPACK compile-time value", "development") === 'production';
+const NEXT_PUBLIC_API_URL = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_API_URL;
+if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
+;
+// Localhost is a development convenience only. In production with the variable
+// missing we deliberately fall back to '' (same-origin) instead of a URL that
+// can never be reached from the user's browser.
+const API_URL = trimSlash(NEXT_PUBLIC_API_URL || (("TURBOPACK compile-time falsy", 0) ? "TURBOPACK unreachable" : 'http://localhost:5100/api'));
 const config = {
     apiUrl: API_URL,
     socketUrl: trimSlash(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.NEXT_PUBLIC_SOCKET_URL || API_URL.replace(/\/api$/, '')),
@@ -7110,8 +7117,20 @@ const config = {
         city: 'Lagos',
         country: 'Nigeria'
     },
-    /** localStorage key holding the persisted session tokens. */ tokenStorageKey: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.TOKENSTORAGEKEY,
-    /** Window in which concurrent 401s share a single refresh call. */ refreshLockMs: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$build$2f$polyfills$2f$process$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].env.REFRESHhLOCKMS,
+    /**
+   * localStorage key holding the persisted session tokens.
+   *
+   * Was `process.env.TOKENSTORAGEKEY`: not a NEXT_PUBLIC_ name, so Next.js
+   * replaces it with `undefined` in the browser bundle and the session was
+   * written under the literal key "undefined". This is an internal client
+   * constant rather than deployment configuration, so it is a literal.
+   */ tokenStorageKey: 'sa.auth.tokens',
+    /**
+   * Window in which concurrent 401s share a single refresh call.
+   *
+   * Was `process.env.REFRESHhLOCKMS` for the same reason (and the name is
+   * misspelt), which made the single-flight guard compare against `undefined`.
+   */ refreshLockMs: 8000,
     /** The backend rejects `limit` above 100 (validated by common.pagination). */ maxPageSize: 100
 };
 const __TURBOPACK__default__export__ = config;
