@@ -32,10 +32,8 @@ const hospitalNumberPrefix = env.HOSPITAL_NUMBER_PREFIX;
  * index on `patients.hospital_number` is the final guard; callers retry through
  * `nextUniqueHospitalNumber`.
  */
-
 async function nextHospitalNumber(year = env.HOSPITAL_NUMBER_YEAR, options = {}) {
-console.error('hospital number first candidate:', first, 'prefix:', prefix);
-
+  
   const prefix = `${hospitalNumberPrefix}-${year}-`;
   const last = await Patient.findOne({
     where: { hospitalNumber: { [Op.like]: `${prefix}%` } },
@@ -54,12 +52,11 @@ console.error('hospital number first candidate:', first, 'prefix:', prefix);
  * case of two registrations racing for the same number.
  */
 async function nextUniqueHospitalNumber(options = {}, attempts = 5) {
-
-
   const year = env.HOSPITAL_NUMBER_YEAR;
   const prefix = `${hospitalNumberPrefix}-${year}-`;
   const first = await nextHospitalNumber(year, options);
-  const firstSequence = Number.parseInt(first.slice(prefix.length), 10);
+  const firstSequence = Number.parseInt(first.slice(prefix.length), 10) || 1;
+  console.error('hospital number first candidate:', first, 'prefix:', prefix);
 
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     const candidate = `${prefix}${pad(firstSequence + attempt)}`;
