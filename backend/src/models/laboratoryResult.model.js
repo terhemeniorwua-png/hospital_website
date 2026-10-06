@@ -9,31 +9,31 @@ const LaboratoryResult = sequelize.define(
   'LaboratoryResult',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     orderId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'LaboratoryOrder', key: 'id' },
       onDelete: 'CASCADE',
     },
     orderItemId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       unique: true,
       references: { model: 'LaboratoryOrderItem', key: 'id' },
       onDelete: 'CASCADE',
     },
     laboratoryTestId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'LaboratoryTest', key: 'id' },
       onDelete: 'RESTRICT',
     },
     patientId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Patient', key: 'id' },
       onDelete: 'CASCADE',
@@ -65,7 +65,7 @@ const LaboratoryResult = sequelize.define(
       allowNull: true,
     },
     performedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
@@ -84,13 +84,13 @@ const LaboratoryResult = sequelize.define(
       allowNull: true,
     },
     publishedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
     },
     verifiedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',

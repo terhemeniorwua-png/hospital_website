@@ -13,10 +13,10 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.createTable('patients', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         hospital_number: {
           type: Sequelize.STRING(30),
@@ -100,11 +100,11 @@ module.exports = {
           defaultValue: "ACTIVE",
         },
         registered_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         updated_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         created_at: {
@@ -120,17 +120,17 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('doctors', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         user_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         department_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         specialization: {
@@ -183,11 +183,11 @@ module.exports = {
           defaultValue: true,
         },
         created_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         updated_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         created_at: {
@@ -203,17 +203,17 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('nurses', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         user_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         department_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         qualification: {
@@ -238,11 +238,11 @@ module.exports = {
           defaultValue: true,
         },
         created_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         updated_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         created_at: {
@@ -258,17 +258,17 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('staff', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         user_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         department_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         staff_type: {
@@ -288,11 +288,11 @@ module.exports = {
           allowNull: true,
         },
         created_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         updated_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         created_at: {
@@ -308,17 +308,17 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('department_staff', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         department_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         user_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         role_in_department: {
@@ -331,7 +331,7 @@ module.exports = {
           defaultValue: false,
         },
         assigned_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         created_at: {

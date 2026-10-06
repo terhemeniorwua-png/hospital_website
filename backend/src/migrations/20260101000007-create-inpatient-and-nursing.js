@@ -13,10 +13,10 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.createTable('wards', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         name: {
           type: Sequelize.STRING(120),
@@ -27,7 +27,7 @@ module.exports = {
           allowNull: false,
         },
         department_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         floor: {
@@ -66,13 +66,13 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('rooms', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         ward_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         room_number: {
@@ -116,17 +116,17 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('beds', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         room_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         ward_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         bed_number: {
@@ -165,45 +165,45 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('admissions', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         admission_number: {
           type: Sequelize.STRING(30),
           allowNull: false,
         },
         patient_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         ward_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         room_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         bed_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         admitted_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         attending_doctor_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         consultation_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         emergency_case_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         status: {
@@ -248,7 +248,7 @@ module.exports = {
           allowNull: true,
         },
         discharged_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         discharge_summary: {
@@ -284,25 +284,25 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('nursing_notes', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         patient_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         admission_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         nurse_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         ward_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         note_type: {
@@ -341,25 +341,25 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('medication_administrations', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         patient_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         admission_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         prescription_item_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         medication_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         medication_name: {
@@ -392,7 +392,7 @@ module.exports = {
           defaultValue: "SCHEDULED",
         },
         nurse_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         notes: {

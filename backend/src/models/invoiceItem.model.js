@@ -7,12 +7,12 @@ const InvoiceItem = sequelize.define(
   'InvoiceItem',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     invoiceId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Invoice', key: 'id' },
       onDelete: 'CASCADE',
@@ -32,7 +32,7 @@ const InvoiceItem = sequelize.define(
       allowNull: true,
     },
     referenceId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
     },
     quantity: {

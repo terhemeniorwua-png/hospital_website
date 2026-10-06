@@ -6,9 +6,9 @@ const Conversation = sequelize.define(
   'Conversation',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     subject: {
       type: DataTypes.STRING(180),
@@ -20,7 +20,7 @@ const Conversation = sequelize.define(
       defaultValue: 'DIRECT',
     },
     patientId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Patient', key: 'id' },
       onDelete: 'SET NULL',
@@ -40,13 +40,13 @@ const Conversation = sequelize.define(
       defaultValue: false,
     },
     createdBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
     },
     updatedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',

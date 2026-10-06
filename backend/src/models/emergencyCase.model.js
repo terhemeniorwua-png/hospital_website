@@ -10,9 +10,9 @@ const EmergencyCase = sequelize.define(
   'EmergencyCase',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     caseNumber: {
       type: DataTypes.STRING(30),
@@ -20,7 +20,7 @@ const EmergencyCase = sequelize.define(
       unique: true,
     },
     patientId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Patient', key: 'id' },
       onDelete: 'SET NULL',
@@ -81,31 +81,31 @@ const EmergencyCase = sequelize.define(
       allowNull: true,
     },
     departmentId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Department', key: 'id' },
       onDelete: 'SET NULL',
     },
     assignedDoctorId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Doctor', key: 'id' },
       onDelete: 'SET NULL',
     },
     consultationId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Consultation', key: 'id' },
       onDelete: 'SET NULL',
     },
     admissionId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Admission', key: 'id' },
       onDelete: 'SET NULL',
     },
     registeredBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
@@ -120,7 +120,7 @@ const EmergencyCase = sequelize.define(
       allowNull: true,
     },
     triagedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',

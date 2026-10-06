@@ -6,18 +6,18 @@ const Diagnosis = sequelize.define(
   'Diagnosis',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     patientId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Patient', key: 'id' },
       onDelete: 'CASCADE',
     },
     consultationId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Consultation', key: 'id' },
       onDelete: 'CASCADE',
@@ -46,7 +46,7 @@ const Diagnosis = sequelize.define(
       allowNull: true,
     },
     diagnosedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',

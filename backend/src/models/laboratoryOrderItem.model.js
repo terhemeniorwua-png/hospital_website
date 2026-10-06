@@ -6,18 +6,18 @@ const LaboratoryOrderItem = sequelize.define(
   'LaboratoryOrderItem',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     orderId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'LaboratoryOrder', key: 'id' },
       onDelete: 'CASCADE',
     },
     laboratoryTestId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'LaboratoryTest', key: 'id' },
       onDelete: 'RESTRICT',

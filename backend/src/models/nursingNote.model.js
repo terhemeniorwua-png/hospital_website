@@ -6,30 +6,30 @@ const NursingNote = sequelize.define(
   'NursingNote',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     patientId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Patient', key: 'id' },
       onDelete: 'CASCADE',
     },
     admissionId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Admission', key: 'id' },
       onDelete: 'CASCADE',
     },
     nurseId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
     },
     wardId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Ward', key: 'id' },
       onDelete: 'SET NULL',

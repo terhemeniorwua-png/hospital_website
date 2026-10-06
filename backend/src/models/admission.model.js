@@ -11,9 +11,9 @@ const Admission = sequelize.define(
   'Admission',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     admissionNumber: {
       type: DataTypes.STRING(30),
@@ -21,49 +21,49 @@ const Admission = sequelize.define(
       unique: true,
     },
     patientId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Patient', key: 'id' },
       onDelete: 'CASCADE',
     },
     wardId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Ward', key: 'id' },
       onDelete: 'RESTRICT',
     },
     roomId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Room', key: 'id' },
       onDelete: 'SET NULL',
     },
     bedId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Bed', key: 'id' },
       onDelete: 'SET NULL',
     },
     admittedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
     },
     attendingDoctorId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Doctor', key: 'id' },
       onDelete: 'SET NULL',
     },
     consultationId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Consultation', key: 'id' },
       onDelete: 'SET NULL',
     },
     emergencyCaseId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'EmergencyCase', key: 'id' },
       onDelete: 'SET NULL',
@@ -110,7 +110,7 @@ const Admission = sequelize.define(
       allowNull: true,
     },
     dischargedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',

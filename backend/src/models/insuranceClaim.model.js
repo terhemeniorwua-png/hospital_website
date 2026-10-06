@@ -6,9 +6,9 @@ const InsuranceClaim = sequelize.define(
   'InsuranceClaim',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     claimNumber: {
       type: DataTypes.STRING(30),
@@ -16,19 +16,19 @@ const InsuranceClaim = sequelize.define(
       unique: true,
     },
     invoiceId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Invoice', key: 'id' },
       onDelete: 'CASCADE',
     },
     policyId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'InsurancePolicy', key: 'id' },
       onDelete: 'RESTRICT',
     },
     patientId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Patient', key: 'id' },
       onDelete: 'CASCADE',
@@ -72,7 +72,7 @@ const InsuranceClaim = sequelize.define(
       allowNull: true,
     },
     reviewedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
@@ -86,13 +86,13 @@ const InsuranceClaim = sequelize.define(
       allowNull: true,
     },
     createdBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
     },
     updatedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',

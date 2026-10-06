@@ -13,17 +13,17 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.createTable('emergency_cases', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         case_number: {
           type: Sequelize.STRING(30),
           allowNull: false,
         },
         patient_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         is_walk_in: {
@@ -77,23 +77,23 @@ module.exports = {
           allowNull: true,
         },
         department_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         assigned_doctor_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         consultation_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         admission_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         registered_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         arrival_at: {
@@ -106,7 +106,7 @@ module.exports = {
           allowNull: true,
         },
         triaged_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         treatment_started_at: {
@@ -132,7 +132,7 @@ module.exports = {
           defaultValue: Sequelize.fn('NOW'),
         },
         emergency_case_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
       }, { transaction });

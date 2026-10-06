@@ -10,9 +10,9 @@ const Prescription = sequelize.define(
   'Prescription',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     prescriptionNumber: {
       type: DataTypes.STRING(30),
@@ -20,25 +20,25 @@ const Prescription = sequelize.define(
       unique: true,
     },
     patientId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Patient', key: 'id' },
       onDelete: 'CASCADE',
     },
     consultationId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Consultation', key: 'id' },
       onDelete: 'SET NULL',
     },
     prescribedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Doctor', key: 'id' },
       onDelete: 'SET NULL',
     },
     prescribedByUser: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
@@ -67,7 +67,7 @@ const Prescription = sequelize.define(
       defaultValue: false,
     },
     verifiedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
@@ -77,7 +77,7 @@ const Prescription = sequelize.define(
       allowNull: true,
     },
     dispensedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',

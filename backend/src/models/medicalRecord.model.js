@@ -9,12 +9,12 @@ const MedicalRecord = sequelize.define(
   'MedicalRecord',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     patientId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Patient', key: 'id' },
       onDelete: 'CASCADE',
@@ -49,24 +49,24 @@ const MedicalRecord = sequelize.define(
       allowNull: true,
     },
     referenceId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
     },
     /** Convenience columns used by the timeline UI. */
     consultationId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Consultation', key: 'id' },
       onDelete: 'CASCADE',
     },
     admissionId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Admission', key: 'id' },
       onDelete: 'SET NULL',
     },
     departmentId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Department', key: 'id' },
       onDelete: 'SET NULL',
@@ -83,7 +83,7 @@ const MedicalRecord = sequelize.define(
       defaultValue: DataTypes.NOW,
     },
     recordedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',

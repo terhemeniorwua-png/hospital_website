@@ -7,9 +7,9 @@ const Appointment = sequelize.define(
   'Appointment',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     appointmentNumber: {
       type: DataTypes.STRING(30),
@@ -17,25 +17,25 @@ const Appointment = sequelize.define(
       unique: true,
     },
     patientId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Patient', key: 'id' },
       onDelete: 'CASCADE',
     },
     doctorId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Doctor', key: 'id' },
       onDelete: 'RESTRICT',
     },
     departmentId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Department', key: 'id' },
       onDelete: 'RESTRICT',
     },
     slotId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'AppointmentSlot', key: 'id' },
       onDelete: 'SET NULL',
@@ -96,19 +96,19 @@ const Appointment = sequelize.define(
       allowNull: true,
     },
     rescheduledFromId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Appointment', key: 'id' },
       onDelete: 'SET NULL',
     },
     createdBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
     },
     updatedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',

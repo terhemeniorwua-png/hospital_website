@@ -6,18 +6,18 @@ const PrescriptionItem = sequelize.define(
   'PrescriptionItem',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     prescriptionId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Prescription', key: 'id' },
       onDelete: 'CASCADE',
     },
     medicationId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Medication', key: 'id' },
       onDelete: 'RESTRICT',

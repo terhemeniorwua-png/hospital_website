@@ -11,18 +11,18 @@ const InventoryTransaction = sequelize.define(
   'InventoryTransaction',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     pharmacyInventoryId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'PharmacyInventory', key: 'id' },
       onDelete: 'CASCADE',
     },
     medicationId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Medication', key: 'id' },
       onDelete: 'CASCADE',
@@ -59,17 +59,17 @@ const InventoryTransaction = sequelize.define(
       comment: 'PRESCRIPTION, PURCHASE, ADJUSTMENT',
     },
     referenceId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
     },
     supplierId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Supplier', key: 'id' },
       onDelete: 'SET NULL',
     },
     performedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',

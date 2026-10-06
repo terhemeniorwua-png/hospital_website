@@ -6,18 +6,18 @@ const ConversationParticipant = sequelize.define(
   'ConversationParticipant',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     conversationId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Conversation', key: 'id' },
       onDelete: 'CASCADE',
     },
     userId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'User', key: 'id' },
       onDelete: 'CASCADE',

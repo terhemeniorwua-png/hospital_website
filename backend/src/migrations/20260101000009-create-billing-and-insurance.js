@@ -13,25 +13,25 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.createTable('invoices', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         invoice_number: {
           type: Sequelize.STRING(30),
           allowNull: false,
         },
         patient_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         admission_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         appointment_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         status: {
@@ -100,11 +100,11 @@ module.exports = {
           allowNull: true,
         },
         created_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         updated_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         created_at: {
@@ -120,13 +120,13 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('invoice_items', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         invoice_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         item_type: {
@@ -143,7 +143,7 @@ module.exports = {
           allowNull: true,
         },
         reference_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         quantity: {
@@ -203,21 +203,21 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('payments', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         payment_number: {
           type: Sequelize.STRING(30),
           allowNull: false,
         },
         invoice_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         patient_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         amount: {
@@ -240,7 +240,7 @@ module.exports = {
           comment: "Receipt / teller reference",
         },
         received_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         notes: {
@@ -260,11 +260,11 @@ module.exports = {
           allowNull: true,
         },
         created_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         updated_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         created_at: {
@@ -280,10 +280,10 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('insurance_providers', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         name: {
           type: Sequelize.STRING(150),
@@ -327,17 +327,17 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('insurance_policies', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         patient_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         provider_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         policy_number: {
@@ -397,25 +397,25 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('insurance_claims', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         claim_number: {
           type: Sequelize.STRING(30),
           allowNull: false,
         },
         invoice_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         policy_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         patient_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         claim_amount: {
@@ -457,7 +457,7 @@ module.exports = {
           allowNull: true,
         },
         reviewed_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         reviewed_at: {
@@ -469,11 +469,11 @@ module.exports = {
           allowNull: true,
         },
         created_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         updated_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         created_at: {

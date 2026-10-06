@@ -6,13 +6,13 @@ const RolePermission = sequelize.define(
   'RolePermission',
   {
     roleId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
       references: { model: 'Role', key: 'id' },
       onDelete: 'CASCADE',
     },
     permissionId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
       references: { model: 'Permission', key: 'id' },
       onDelete: 'CASCADE',

@@ -10,9 +10,9 @@ const Invoice = sequelize.define(
   'Invoice',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     invoiceNumber: {
       type: DataTypes.STRING(30),
@@ -20,19 +20,19 @@ const Invoice = sequelize.define(
       unique: true,
     },
     patientId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Patient', key: 'id' },
       onDelete: 'CASCADE',
     },
     admissionId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Admission', key: 'id' },
       onDelete: 'SET NULL',
     },
     appointmentId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Appointment', key: 'id' },
       onDelete: 'SET NULL',
@@ -103,13 +103,13 @@ const Invoice = sequelize.define(
       allowNull: true,
     },
     createdBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
     },
     updatedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',

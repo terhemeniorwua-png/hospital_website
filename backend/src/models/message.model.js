@@ -6,18 +6,18 @@ const Message = sequelize.define(
   'Message',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     conversationId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Conversation', key: 'id' },
       onDelete: 'CASCADE',
     },
     senderId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
@@ -35,7 +35,7 @@ const Message = sequelize.define(
       allowNull: true,
     },
     documentId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Document', key: 'id' },
       onDelete: 'SET NULL',
@@ -46,7 +46,7 @@ const Message = sequelize.define(
       defaultValue: false,
     },
     patientId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Patient', key: 'id' },
       onDelete: 'SET NULL',

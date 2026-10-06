@@ -7,9 +7,9 @@ const Payment = sequelize.define(
   'Payment',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     paymentNumber: {
       type: DataTypes.STRING(30),
@@ -17,13 +17,13 @@ const Payment = sequelize.define(
       unique: true,
     },
     invoiceId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Invoice', key: 'id' },
       onDelete: 'CASCADE',
     },
     patientId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Patient', key: 'id' },
       onDelete: 'CASCADE',
@@ -48,7 +48,7 @@ const Payment = sequelize.define(
       comment: 'Receipt / teller reference',
     },
     receivedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
@@ -70,13 +70,13 @@ const Payment = sequelize.define(
       allowNull: true,
     },
     createdBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
     },
     updatedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',

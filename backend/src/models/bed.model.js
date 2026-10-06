@@ -7,18 +7,18 @@ const Bed = sequelize.define(
   'Bed',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     roomId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Room', key: 'id' },
       onDelete: 'CASCADE',
     },
     wardId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Ward', key: 'id' },
       onDelete: 'CASCADE',

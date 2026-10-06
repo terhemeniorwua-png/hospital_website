@@ -11,9 +11,9 @@ const QueueEntry = sequelize.define(
   'QueueEntry',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     /** "A-001" style ticket, unique within (departmentId, queueDate). */
     ticketNumber: {
@@ -25,26 +25,26 @@ const QueueEntry = sequelize.define(
       allowNull: false,
     },
     departmentId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Department', key: 'id' },
       onDelete: 'CASCADE',
     },
     doctorId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'Doctor', key: 'id' },
       onDelete: 'SET NULL',
     },
     appointmentId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       unique: true,
       references: { model: 'Appointment', key: 'id' },
       onDelete: 'SET NULL',
     },
     patientId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Patient', key: 'id' },
       onDelete: 'CASCADE',
@@ -100,7 +100,7 @@ const QueueEntry = sequelize.define(
       allowNull: true,
     },
     calledBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
@@ -110,13 +110,13 @@ const QueueEntry = sequelize.define(
       allowNull: true,
     },
     createdBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
     },
     updatedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',

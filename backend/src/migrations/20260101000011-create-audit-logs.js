@@ -19,7 +19,7 @@ module.exports = {
           autoIncrement: true,
         },
         user_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         user_email: {
@@ -43,7 +43,7 @@ module.exports = {
           allowNull: true,
         },
         patient_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         method: {

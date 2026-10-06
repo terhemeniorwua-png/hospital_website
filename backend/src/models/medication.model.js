@@ -6,9 +6,9 @@ const Medication = sequelize.define(
   'Medication',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     code: {
       type: DataTypes.STRING(30),

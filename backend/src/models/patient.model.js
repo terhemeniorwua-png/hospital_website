@@ -8,9 +8,9 @@ const Patient = sequelize.define(
   'Patient',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     /** Auto generated, e.g. HOSP-2026-000001 */
     hospitalNumber: {
@@ -99,13 +99,13 @@ const Patient = sequelize.define(
       defaultValue: PATIENT_STATUS.ACTIVE,
     },
     registeredBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
     },
     updatedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',

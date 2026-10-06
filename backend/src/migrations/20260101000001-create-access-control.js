@@ -13,10 +13,10 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.createTable('roles', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         name: {
           type: Sequelize.STRING(50),
@@ -49,10 +49,10 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('permissions', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         name: {
           type: Sequelize.STRING(80),
@@ -83,12 +83,12 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('role_permissions', {
         role_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
         },
         permission_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
         },
@@ -105,10 +105,10 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('departments', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         name: {
           type: Sequelize.STRING(120),
@@ -157,10 +157,10 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('users', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         first_name: {
           type: Sequelize.STRING(80),
@@ -183,7 +183,7 @@ module.exports = {
           allowNull: false,
         },
         role_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         status: {
@@ -192,7 +192,7 @@ module.exports = {
           defaultValue: "ACTIVE",
         },
         patient_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         employee_id: {
@@ -242,11 +242,11 @@ module.exports = {
           allowNull: true,
         },
         created_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         updated_by: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         created_at: {
@@ -262,13 +262,13 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('refresh_tokens', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         user_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         token_hash: {
@@ -292,7 +292,7 @@ module.exports = {
           allowNull: true,
         },
         replaced_by_token_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
         },
         user_agent: {
@@ -316,13 +316,13 @@ module.exports = {
       }, { transaction });
       await queryInterface.createTable('password_resets', {
         id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         user_id: {
-          type: Sequelize.INTEGER,
+          type: Sequelize.UUID,
           allowNull: false,
         },
         token_hash: {

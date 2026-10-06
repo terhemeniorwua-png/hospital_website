@@ -6,12 +6,12 @@ const PasswordReset = sequelize.define(
   'PasswordReset',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     userId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'User', key: 'id' },
       onDelete: 'CASCADE',

@@ -9,18 +9,18 @@ const DepartmentStaff = sequelize.define(
   'DepartmentStaff',
   {
     id: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     departmentId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'Department', key: 'id' },
       onDelete: 'CASCADE',
     },
     userId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       references: { model: 'User', key: 'id' },
       onDelete: 'CASCADE',
@@ -35,7 +35,7 @@ const DepartmentStaff = sequelize.define(
       defaultValue: false,
     },
     assignedBy: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
       references: { model: 'User', key: 'id' },
       onDelete: 'SET NULL',
