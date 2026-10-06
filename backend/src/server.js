@@ -18,8 +18,8 @@ async function start() {
   attachRealtime(server);
 
   if (env.JOB_INTERVALS_ENABLED) {
-    const { startJobs } = require('./jobs');
-    startJobs();
+    const { start } = require('./jobs');
+    start();
   }
 
   await new Promise((resolve) => server.listen(env.PORT, env.HOST, resolve));
@@ -36,8 +36,8 @@ async function start() {
     logger.info('server.shutdown_started', { signal });
     server.close(async () => {
       try {
-        const { stopJobs } = require('./jobs');
-        stopJobs();
+        const { stop } = require('./jobs');
+        stop();
         await sequelize.close();
       } catch (error) {
         logger.error('server.shutdown_error', { message: error.message });
