@@ -51,8 +51,6 @@ if (error && error.name === 'SequelizeForeignKeyConstraintError') {
     return AppError.badRequest('Malformed JSON payload');
   }
 
-  return null;
-}
 
 // eslint-disable-next-line no-unused-vars
 function errorHandler(error, req, res, next) {
