@@ -11,6 +11,7 @@ const { EVENTS } = require('../realtime/events');
 const realtime = require('../realtime/socket');
 const notificationService = require('./notification.service');
 const { QueueEntry, Patient, Department, Doctor, Appointment, User } = require('../models');
+const { sameId } = require('../utils/ids');
 
 /**
  * Waiting room queue.
@@ -177,8 +178,8 @@ async function list({ user, query = {} }) {
   const where = combineWhere(
     roleNameOf(user) === 'PATIENT' ? { patientId: user.patientId ?? -1 } : undefined,
     { queueDate: day },
-    query.departmentId ? { departmentId: Number(query.departmentId) } : undefined,
-    query.doctorId ? { doctorId: Number(query.doctorId) } : undefined,
+    query.departmentId ? { departmentId: query.departmentId } : undefined,
+    query.doctorId ? { doctorId: query.doctorId } : undefined,
     query.status ? { status: query.status } : undefined,
     query.priority ? { priority: query.priority } : undefined,
     searchWhere(query.search, [['ticketNumber', 'string']]),
@@ -204,13 +205,13 @@ async function list({ user, query = {} }) {
  * the same time; both steps share one transaction.
  */
 async function join({ user, data }) {
-  const patientId = roleNameOf(user) === 'PATIENT' ? user.patientId : Number(data.patientId);
+  const patientId = roleNameOf(user) === 'PATIENT' ? user.patientId : data.patientId;
   if (!patientId) throw AppError.badRequest('patientId is required');
 
   const patient = await Patient.findByPk(patientId);
   if (!patient) throw AppError.notFound('Patient not found');
 
-  const departmentId = Number(data.departmentId);
+  const departmentId = data.departmentId;
   const department = await Department.findByPk(departmentId);
   if (!department) throw AppError.notFound('Department not found');
 
@@ -218,7 +219,7 @@ async function join({ user, data }) {
   if (data.appointmentId) {
     appointment = await Appointment.findByPk(data.appointmentId);
     if (!appointment) throw AppError.notFound('Appointment not found');
-    if (Number(appointment.patientId) !== Number(patientId)) {
+    if (!sameId(appointment.patientId, patientId)) {
       throw AppError.forbidden('That appointment belongs to a different patient');
     }
   }
@@ -262,7 +263,7 @@ async function join({ user, data }) {
         ticketNumber,
         queueDate: date,
         departmentId,
-        doctorId: data.doctorId ? Number(data.doctorId) : appointment?.doctorId ?? null,
+        doctorId: data.doctorId ? data.doctorId : appointment?.doctorId ?? null,
         appointmentId: appointment?.id ?? null,
         patientId,
         isWalkIn: data.isWalkIn ?? !appointment,
@@ -299,7 +300,7 @@ async function join({ user, data }) {
 /** Calls the next waiting patient (or a specific ticket) into the room. */
 async function callNext({ user, departmentId, date, ticketNumber }) {
   const day = date || toDateOnly();
-  const department = Number(departmentId);
+  const department = departmentId;
 
   const entry = await sequelize.transaction(async (transaction) => {
     const candidates = await QueueEntry.findAll({
@@ -445,20 +446,20 @@ async function skip({ user, id, reason }) {
 async function estimate({ departmentId, date, ticketNumber }) {
   const day = date || toDateOnly();
   const entry = await QueueEntry.findOne({
-    where: { departmentId: Number(departmentId), queueDate: day, ticketNumber },
+    where: { departmentId: departmentId, queueDate: day, ticketNumber },
   });
   if (!entry) throw AppError.notFound('Queue entry not found');
 
   const ahead = await QueueEntry.count({
     where: {
-      departmentId: Number(departmentId),
+      departmentId: departmentId,
       queueDate: day,
       status: QUEUE_STATUS.WAITING,
       joinedAt: { [Op.lt]: entry.joinedAt },
     },
   });
 
-  const { averageServiceMinutes } = await refreshPositions({ departmentId: Number(departmentId), date: day });
+  const { averageServiceMinutes } = await refreshPositions({ departmentId: departmentId, date: day });
 
   return {
     ticketNumber: entry.ticketNumber,
@@ -473,7 +474,7 @@ async function estimate({ departmentId, date, ticketNumber }) {
 async function getById({ user, id }) {
   const entry = await QueueEntry.findByPk(id, { include: QUEUE_INCLUDES });
   if (!entry) throw AppError.notFound('Queue entry not found');
-  if (roleNameOf(user) === 'PATIENT' && Number(entry.patientId) !== Number(user.patientId)) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(entry.patientId, user.patientId)) {
     throw AppError.forbidden('You are not authorised to view this queue entry');
   }
   return present(entry);
@@ -492,7 +493,7 @@ async function remove({ id }) {
 
 async function statistics({ departmentId, date }) {
   const day = date || toDateOnly();
-  const where = combineWhere({ queueDate: day }, departmentId ? { departmentId: Number(departmentId) } : undefined);
+  const where = combineWhere({ queueDate: day }, departmentId ? { departmentId: departmentId } : undefined);
 
   const rows = await QueueEntry.findAll({
     where,
@@ -521,7 +522,7 @@ async function statistics({ departmentId, date }) {
 
   return {
     date: day,
-    departmentId: departmentId ? Number(departmentId) : null,
+    departmentId: departmentId ? departmentId : null,
     byStatus,
     averageWaitMinutes: Math.round(Number(waitRow?.avgWait || 0)),
   };

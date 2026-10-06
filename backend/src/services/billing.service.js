@@ -12,6 +12,7 @@ const { EVENTS } = require('../realtime/events');
 const realtime = require('../realtime/socket');
 const notificationService = require('./notification.service');
 const auditService = require('./audit.service');
+const { sameId } = require('../utils/ids');
 const {
   Invoice,
   InvoiceItem,
@@ -89,8 +90,8 @@ async function list({ user, query = {} }) {
   const where = combineWhere(
     roleNameOf(user) === 'PATIENT' ? { patientId: user.patientId ?? -1 } : undefined,
     statuses ? { status: { [Op.in]: statuses } } : undefined,
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
-    query.admissionId ? { admissionId: Number(query.admissionId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
+    query.admissionId ? { admissionId: query.admissionId } : undefined,
     query.unpaid === true ? { balance: { [Op.gt]: 0 } } : undefined,
     query.overdue === true
       ? { dueDate: { [Op.lt]: new Date() }, balance: { [Op.gt]: 0 } }
@@ -121,7 +122,7 @@ async function getById({ user, id }) {
     ],
   });
   if (!invoice) throw AppError.notFound('Invoice not found');
-  if (roleNameOf(user) === 'PATIENT' && Number(invoice.patientId) !== Number(user.patientId)) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(invoice.patientId, user.patientId)) {
     throw AppError.forbidden('You are not authorised to view this invoice');
   }
 
@@ -442,7 +443,7 @@ async function resolveInsuranceAmount({ patientId, total, claimAmount, policyId 
 
   const policy = await InsurancePolicy.findOne({
     where: combineWhere(
-      policyId ? { id: Number(policyId) } : { patientId, status: 'ACTIVE', isPrimary: true },
+      policyId ? { id: policyId } : { patientId, status: 'ACTIVE', isPrimary: true },
       { startDate: { [Op.lte]: new Date() }, endDate: { [Op.gte]: new Date() } },
     ),
   });
@@ -753,8 +754,8 @@ async function listPayments({ user, query = {} }) {
 
   const where = combineWhere(
     roleNameOf(user) === 'PATIENT' ? { patientId: user.patientId ?? -1 } : undefined,
-    query.invoiceId ? { invoiceId: Number(query.invoiceId) } : undefined,
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
+    query.invoiceId ? { invoiceId: query.invoiceId } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
     query.method ? { method: query.method } : undefined,
     query.status ? { status: query.status } : undefined,
     query.from ? { paidAt: { [Op.gte]: new Date(query.from) } } : undefined,
@@ -783,7 +784,7 @@ async function listPayments({ user, query = {} }) {
 
 /** Everything the patient owes, aggregated. */
 async function statement({ user, patientId }) {
-  const pid = roleNameOf(user) === 'PATIENT' ? user.patientId : Number(patientId);
+  const pid = roleNameOf(user) === 'PATIENT' ? user.patientId : patientId;
   if (!pid) throw AppError.badRequest('patientId is required');
 
   const patient = await Patient.findByPk(pid);

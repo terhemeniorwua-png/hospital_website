@@ -13,10 +13,10 @@ module.exports = {
     await queryInterface.sequelize.transaction(async (transaction) => {
       await queryInterface.createTable('audit_logs', {
         id: {
-          type: Sequelize.BIGINT,
+          type: Sequelize.UUID,
           allowNull: true,
           primaryKey: true,
-          autoIncrement: true,
+          defaultValue: Sequelize.literal('gen_random_uuid()'),
         },
         user_id: {
           type: Sequelize.UUID,

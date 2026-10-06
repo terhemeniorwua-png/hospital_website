@@ -5,6 +5,7 @@ const { combineWhere } = require('../utils/queryHelpers');
 const { roleNameOf, isClinicalStaff } = require('../utils/accessControl');
 const { MEDICAL_RECORD_TYPES, CONSULTATION_STATUS } = require('../config/constants');
 const auditService = require('./audit.service');
+const { sameId } = require('../utils/ids');
 const {
   MedicalRecord,
   Patient,
@@ -33,7 +34,7 @@ const {
 function assertCanAccess(user, patientId) {
   if (!user) throw AppError.unauthorized('Authentication required');
   if (roleNameOf(user) === 'PATIENT') {
-    if (!user.patientId || Number(user.patientId) !== Number(patientId)) {
+    if (!user.patientId || !sameId(user.patientId, patientId)) {
       throw AppError.forbidden('You are not authorised to view this patient record');
     }
     return;
@@ -81,7 +82,7 @@ async function list({ user, patientId, query = {} }) {
   const { page, limit, offset } = getPagination(query);
 
   const where = combineWhere(
-    { patientId: Number(patientId) },
+    { patientId: patientId },
     query.recordType ? { recordType: query.recordType } : undefined,
     query.from ? { occurredAt: { [Op.gte]: new Date(query.from) } } : undefined,
     query.to ? { occurredAt: { [Op.lte]: new Date(query.to) } } : undefined,
@@ -105,7 +106,7 @@ async function list({ user, patientId, query = {} }) {
  */
 async function timeline({ user, patientId, query = {} }) {
   assertCanAccess(user, patientId);
-  const pid = Number(patientId);
+  const pid = patientId;
   const from = query.from ? new Date(query.from) : null;
   const to = query.to ? new Date(query.to) : null;
   const limit = Math.min(Number(query.limit) || 100, 500);
@@ -308,7 +309,7 @@ async function exportRecord({ user, patientId, req, format = 'json' }) {
     action: 'MEDICAL_RECORD_EXPORTED',
     resource: 'medical_record',
     resourceId: String(patientId),
-    patientId: Number(patientId),
+    patientId: patientId,
     req,
     metadata: { format, eventCount: timelineData.events.length },
   });

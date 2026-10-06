@@ -1,2 +1,18 @@
 {"timestamp":"00:00:05.424","source":"Server","level":"LOG","message":""}
 {"timestamp":"00:00:08.595","source":"Server","level":"LOG","message":"○ Compiling / ..."}
+{"timestamp":"00:11:59.238","source":"Server","level":"LOG","message":"○ Compiling /register ..."}
+{"timestamp":"00:12:13.751","source":"Server","level":"ERROR","message":"TimeoutError: The operation was aborted due to timeout"}
+{"timestamp":"00:12:57.870","source":"Server","level":"ERROR","message":"TypeError: fetch failed"}
+{"timestamp":"00:13:17.194","source":"Server","level":"LOG","message":"✓ Finished filesystem cache database compaction in 19.7s"}
+{"timestamp":"00:39:47.392","source":"Server","level":"LOG","message":"✓ Compiled in 27.4s"}
+{"timestamp":"00:39:56.119","source":"Server","level":"LOG","message":"✓ Compiled in 5.6s"}
+{"timestamp":"00:39:56.382","source":"Server","level":"WARN","message":"⚠ Fast Refresh had to perform a full reload when ./src/lib/api/client.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload"}
+{"timestamp":"00:42:46.704","source":"Browser","level":"WARN","message":"Image with src \"https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1000&q=80\" was detected as the Largest Contentful Paint (LCP). Please add the `loading=\"eager\"` property if this image is above the fold.\nRead more: https://nextjs.org/docs/app/api-reference/components/image#loading"}
+{"timestamp":"00:42:48.071","source":"Server","level":"WARN","message":"[browser] \"\\u001b[33mImage with src \\\"https://images.unsplash.com/photo-1576091160550-2173dba999ef?auto=format&fit=crop&w=1000&q=80\\\" was detected as the Largest Contentful Paint (LCP). Please add the `loading=\\\"eager\\\"` property if this image is above the fold.\\nRead more: https://nextjs.org/docs/app/api-reference/components/image#loading\\u001b[39m\""}
+{"timestamp":"00:48:17.472","source":"Server","level":"LOG","message":"✓ Compiled in 2.4s"}
+{"timestamp":"00:48:17.478","source":"Server","level":"WARN","message":"⚠ Fast Refresh had to perform a full reload when ./src/lib/api/client.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload"}
+{"timestamp":"00:54:51.366","source":"Server","level":"LOG","message":"✓ Compiled in 1653ms"}
+{"timestamp":"00:54:51.556","source":"Server","level":"WARN","message":"⚠ Fast Refresh had to perform a full reload when ./src/lib/config.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload"}
+{"timestamp":"01:04:56.487","source":"Server","level":"LOG","message":"✓ Compiled in 541ms"}
+{"timestamp":"01:04:56.654","source":"Server","level":"WARN","message":"⚠ Fast Refresh had to perform a full reload when ./src/lib/config.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload"}
+{"timestamp":"01:05:00.836","source":"Server","level":"WARN","message":"⚠ Fast Refresh had to perform a full reload when ./src/lib/config.js changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload"}

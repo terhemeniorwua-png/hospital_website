@@ -8,7 +8,7 @@ const logger = require('./utils/logger');
 const { apiLimiter } = require('./middleware/rateLimiter');
 const { notFound, errorHandler } = require('./middleware/errorHandler');
 const routes = require('./routes');
-
+require('/dotenv').config()
 /**
  * Express application factory.
  *

@@ -35,7 +35,7 @@ const setBedStatus = asyncHandler(async (req, res) => {
 
 const bedCounts = asyncHandler(async (req, res) => {
   const query = queryOf(req);
-  const data = await admissionService.bedCounts(query.wardId ? Number(query.wardId) : undefined);
+  const data = await admissionService.bedCounts(query.wardId ? query.wardId : undefined);
   return success(res, { message: 'Bed counts', data });
 });
 

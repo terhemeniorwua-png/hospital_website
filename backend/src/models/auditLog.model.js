@@ -10,9 +10,9 @@ const AuditLog = sequelize.define(
   'AuditLog',
   {
     id: {
-      type: DataTypes.BIGINT,
+      type: DataTypes.UUID,
       primaryKey: true,
-      autoIncrement: true,
+      defaultValue: DataTypes.UUIDV4,
     },
     userId: {
       type: DataTypes.UUID,

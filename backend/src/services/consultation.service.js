@@ -11,6 +11,7 @@ const { EVENTS } = require('../realtime/events');
 const realtime = require('../realtime/socket');
 const medicalRecordService = require('./medicalRecord.service');
 const notificationService = require('./notification.service');
+const { sameId } = require('../utils/ids');
 const {
   Consultation,
   Patient,
@@ -74,7 +75,7 @@ function assertCanWrite(user) {
 async function findReadable(user, id, options = {}) {
   const consultation = await Consultation.findByPk(id, options);
   if (!consultation) throw AppError.notFound('Consultation not found');
-  if (roleNameOf(user) === 'PATIENT' && Number(consultation.patientId) !== Number(user.patientId)) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(consultation.patientId, user.patientId)) {
     throw AppError.forbidden('You are not authorised to view this consultation');
   }
   return consultation;
@@ -86,10 +87,10 @@ async function list({ user, query = {} }) {
 
   const where = combineWhere(
     roleNameOf(user) === 'PATIENT' ? { patientId: user.patientId ?? -1 } : undefined,
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
-    query.doctorId ? { doctorId: Number(query.doctorId) } : undefined,
-    query.departmentId ? { departmentId: Number(query.departmentId) } : undefined,
-    query.appointmentId ? { appointmentId: Number(query.appointmentId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
+    query.doctorId ? { doctorId: query.doctorId } : undefined,
+    query.departmentId ? { departmentId: query.departmentId } : undefined,
+    query.appointmentId ? { appointmentId: query.appointmentId } : undefined,
     query.status ? { status: query.status } : undefined,
     query.from ? { createdAt: { [Op.gte]: new Date(query.from) } } : undefined,
     query.to ? { createdAt: { [Op.lte]: new Date(query.to) } } : undefined,
@@ -157,7 +158,7 @@ async function start({ user, data }) {
   if (data.appointmentId) {
     const appointment = await Appointment.findByPk(data.appointmentId);
     if (!appointment) throw AppError.notFound('Appointment not found');
-    if (Number(appointment.patientId) !== Number(patient.id)) {
+    if (!sameId(appointment.patientId, patient.id)) {
       throw AppError.badRequest('Appointment belongs to a different patient');
     }
   }
@@ -366,7 +367,7 @@ async function updateDiagnosis({ user, diagnosisId, data }) {
 async function recordVitals({ user, patientId, consultationId, data }) {
   assertCanWrite(user);
   const consultation = consultationId ? await findReadable(user, consultationId) : null;
-  const targetPatientId = consultation ? consultation.patientId : Number(patientId);
+  const targetPatientId = consultation ? consultation.patientId : patientId;
   if (!targetPatientId) throw AppError.badRequest('patientId is required');
 
   const vitals = await VitalSign.create({
@@ -412,7 +413,7 @@ function computeBmi(weight, height) {
 async function clinicalHistory({ user, patientId }) {
   const patient = await Patient.findByPk(patientId);
   if (!patient) throw AppError.notFound('Patient not found');
-  if (roleNameOf(user) === 'PATIENT' && Number(user.patientId) !== Number(patientId)) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(user.patientId, patientId)) {
     throw AppError.forbidden('You are not authorised to view this history');
   }
 
@@ -476,8 +477,8 @@ async function followUpList({ user, query = {} }) {
   const where = combineWhere(
     { followUpDate: { [Op.gte]: today } },
     roleNameOf(user) === 'PATIENT' ? { patientId: user.patientId ?? -1 } : undefined,
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
-    query.doctorId ? { doctorId: Number(query.doctorId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
+    query.doctorId ? { doctorId: query.doctorId } : undefined,
   );
 
   const { rows, count } = await Consultation.findAndCountAll({

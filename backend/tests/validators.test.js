@@ -100,20 +100,24 @@ describe('validators: supplied filters are still type-checked', () => {
     }
   });
 
-  it('coerces query strings into numbers for id filters', () => {
+  it('parses id filters as uuids and keeps numeric filters numeric', () => {
     const consultationList = require('../src/validators/consultation.validator').list.query;
-    expect(consultationList.parse({ patientId: '42', limit: '5' }).patientId).toBe(42);
+    const patientId = '31745de3-eca2-4ffb-84f9-f84b29c34f67';
+    expect(consultationList.parse({ patientId, limit: '5' })).toMatchObject({ patientId, limit: 5 });
+    expect(consultationList.safeParse({ patientId: '42', limit: '5' }).success).toBe(false);
   });
 });
 
 describe('validators: shared helpers', () => {
   const common = require('../src/validators/common');
 
-  it('coerces query ids and rejects unusable values', () => {
-    expect(common.optionalId.safeParse('42').data).toBe(42);
+  it('accepts uuid query ids and rejects unusable values', () => {
+    const uuid = '31745de3-eca2-4ffb-84f9-f84b29c34f67';
+    expect(common.optionalId.safeParse(uuid).data).toBe(uuid);
     expect(common.optionalId.safeParse(undefined).success).toBe(true);
     expect(common.optionalId.safeParse('abc').success).toBe(false);
-    expect(common.optionalId.safeParse('0').success).toBe(false);
+    expect(common.optionalId.safeParse('42').success).toBe(false);
+    expect(common.optionalId.safeParse('not-a-uuid').success).toBe(false);
   });
 
   it('parses booleanish flags in every query representation', () => {
@@ -150,7 +154,8 @@ describe('validators: shared helpers', () => {
   });
 
   it('requires a route id', () => {
-    expect(common.idRoute.params.safeParse({ id: '7' }).success).toBe(true);
+    expect(common.idRoute.params.safeParse({ id: '31745de3-eca2-4ffb-84f9-f84b29c34f67' }).success).toBe(true);
+    expect(common.idRoute.params.safeParse({ id: '7' }).success).toBe(false);
     expect(common.idRoute.params.safeParse({}).success).toBe(false);
   });
 });

@@ -11,6 +11,7 @@ const notificationService = require('./notification.service');
 const medicalRecordService = require('./medicalRecord.service');
 const admissionService = require('./admission.service');
 const consultationService = require('./consultation.service');
+const { sameId } = require('../utils/ids');
 const {
   EmergencyCase,
   VitalSign,
@@ -133,7 +134,7 @@ async function waitingRoom({ departmentId }) {
   const cases = await EmergencyCase.findAll({
     where: combineWhere(
       { status: { [Op.in]: [EMERGENCY_STATUS.TRIAGED, EMERGENCY_STATUS.WAITING] } },
-      departmentId ? { departmentId: Number(departmentId) } : undefined,
+      departmentId ? { departmentId: departmentId } : undefined,
     ),
     include: CASE_INCLUDES,
   });
@@ -166,13 +167,13 @@ async function waitingRoom({ departmentId }) {
     };
   });
 
-  return { departmentId: departmentId ? Number(departmentId) : null, entries, total: entries.length };
+  return { departmentId: departmentId ? departmentId : null, entries, total: entries.length };
 }
 
 async function broadcastWaitingRoom(departmentId) {
   const snapshot = await waitingRoom({ departmentId });
   if (departmentId) {
-    realtime.emitToDepartment(Number(departmentId), EVENTS.QUEUE_UPDATED, snapshot);
+    realtime.emitToDepartment(departmentId, EVENTS.QUEUE_UPDATED, snapshot);
   }
   realtime.emitToHospital(EVENTS.QUEUE_UPDATED, snapshot);
 }
@@ -352,7 +353,7 @@ async function getCase({ user, id }) {
     ],
   });
   if (!emergencyCase) throw AppError.notFound('Emergency case not found');
-  if (roleNameOf(user) === 'PATIENT' && Number(emergencyCase.patientId) !== Number(user.patientId)) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(emergencyCase.patientId, user.patientId)) {
     throw AppError.forbidden('You are not authorised to view this emergency case');
   }
 
@@ -367,10 +368,10 @@ async function list({ user, query = {} }) {
     roleNameOf(user) === 'PATIENT' ? { patientId: user.patientId ?? -1 } : undefined,
     query.active === true ? { status: { [Op.in]: ACTIVE_CASE_STATUSES } } : undefined,
     statuses ? { status: { [Op.in]: statuses } } : undefined,
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
-    query.departmentId ? { departmentId: Number(query.departmentId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
+    query.departmentId ? { departmentId: query.departmentId } : undefined,
     query.triageLevel ? { triageLevel: Number(query.triageLevel) } : undefined,
-    query.assignedDoctorId ? { assignedDoctorId: Number(query.assignedDoctorId) } : undefined,
+    query.assignedDoctorId ? { assignedDoctorId: query.assignedDoctorId } : undefined,
     query.date
       ? { arrivalAt: { [Op.between]: [new Date(`${query.date}T00:00:00Z`), new Date(`${query.date}T23:59:59Z`)] } }
       : undefined,
@@ -392,7 +393,7 @@ async function list({ user, query = {} }) {
 /** The ED board, grouped by triage level. */
 async function board({ query = {} }) {
   const where = combineWhere(
-    query.departmentId ? { departmentId: Number(query.departmentId) } : undefined,
+    query.departmentId ? { departmentId: query.departmentId } : undefined,
     { status: { [Op.in]: ACTIVE_CASE_STATUSES } },
   );
 

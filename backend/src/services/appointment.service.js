@@ -7,6 +7,7 @@ const { searchWhere, combineWhere } = require('../utils/queryHelpers');
 const { numbered } = require('../utils/codeGenerator');
 const { toDateOnly, combineDateTime, timeToMinutes, isPast } = require('../utils/dates');
 const { roleNameOf } = require('../utils/accessControl');
+const { sameId } = require('../utils/ids');
 const {
   APPOINTMENT_STATUS,
   SLOT_STATUS,
@@ -70,9 +71,9 @@ async function list({ user, query = {} }) {
   const where = combineWhere(
     scopeFor(user),
     statuses ? { status: { [Op.in]: statuses } } : undefined,
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
-    query.doctorId ? { doctorId: Number(query.doctorId) } : undefined,
-    query.departmentId ? { departmentId: Number(query.departmentId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
+    query.doctorId ? { doctorId: query.doctorId } : undefined,
+    query.departmentId ? { departmentId: query.departmentId } : undefined,
     query.type ? { type: query.type } : undefined,
     query.date ? { appointmentDate: query.date } : undefined,
     query.from ? { appointmentDate: { [Op.gte]: query.from } } : undefined,
@@ -123,7 +124,7 @@ async function availableDoctors({ departmentId, date, query = {} }) {
   const { page, limit, offset } = getPagination(query);
   const where = combineWhere(
     { isAcceptingAppointments: true },
-    departmentId ? { departmentId: Number(departmentId) } : undefined,
+    departmentId ? { departmentId: departmentId } : undefined,
     query.specialization ? { specialization: { [Op.iLike]: `%${query.specialization}%` } } : undefined,
   );
 
@@ -232,7 +233,7 @@ async function availability({ doctorId, date }) {
 async function blockSlot({ doctorId, slotId, isBlocked, notes, actor }) {
   const slot = await AppointmentSlot.findByPk(slotId);
   if (!slot) throw AppError.notFound('Slot not found');
-  if (Number(slot.doctorId) !== Number(doctorId)) throw AppError.badRequest('Slot does not belong to this doctor');
+  if (!sameId(slot.doctorId, doctorId)) throw AppError.badRequest('Slot does not belong to this doctor');
 
   const booked = await Appointment.count({
     where: { slotId: slot.id, status: { [Op.in]: LIVE_STATUSES } },
@@ -283,7 +284,7 @@ async function book({ user, data }) {
   const departmentId = data.departmentId ?? doctor.departmentId;
   const department = await Department.findByPk(departmentId);
   if (!department) throw AppError.notFound('Department not found');
-  if (doctor.departmentId && Number(doctor.departmentId) !== Number(departmentId)) {
+  if (doctor.departmentId && !sameId(doctor.departmentId, departmentId)) {
     throw AppError.badRequest('Doctor does not work in the selected department');
   }
   if (!doctor.isAcceptingAppointments) {
@@ -306,7 +307,7 @@ async function book({ user, data }) {
         lock: transaction.LOCK.UPDATE,
       });
       if (!slot) throw AppError.notFound('Slot not found');
-      if (Number(slot.doctorId) !== Number(doctor.id)) throw AppError.badRequest('Slot belongs to a different doctor');
+      if (!sameId(slot.doctorId, doctor.id)) throw AppError.badRequest('Slot belongs to a different doctor');
       if (String(slot.slotDate) !== String(date)) throw AppError.badRequest('Slot is not on the requested date');
       if (slot.isBlocked) throw AppError.conflict('That slot has been blocked');
     } else {
@@ -381,13 +382,13 @@ async function book({ user, data }) {
 function resolvePatientId(user, requested) {
   if (roleNameOf(user) === 'PATIENT') {
     if (!user.patientId) throw AppError.forbidden('Your account is not linked to a patient record');
-    if (requested && Number(requested) !== Number(user.patientId)) {
+    if (requested && !sameId(requested, user.patientId)) {
       throw AppError.forbidden('You may only book appointments for yourself');
     }
     return user.patientId;
   }
   if (!requested) throw AppError.badRequest('patientId is required');
-  return Number(requested);
+  return requested;
 }
 
 async function recipientUserIds({ patientId, doctorUserId }) {
@@ -401,7 +402,7 @@ async function recipientUserIds({ patientId, doctorUserId }) {
 async function getById({ user, id }) {
   const appointment = await Appointment.findByPk(id, { include: APPT_INCLUDE });
   if (!appointment) throw AppError.notFound('Appointment not found');
-  if (roleNameOf(user) === 'PATIENT' && Number(appointment.patientId) !== Number(user.patientId)) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(appointment.patientId, user.patientId)) {
     throw AppError.forbidden('You are not authorised to view this appointment');
   }
   return present(appointment);
@@ -591,7 +592,7 @@ async function markNoShows({ user, date, departmentId }) {
   const stale = await Appointment.findAll({
     where: combineWhere(
       { appointmentDate: day, status: { [Op.in]: [APPOINTMENT_STATUS.CONFIRMED, APPOINTMENT_STATUS.REQUESTED] } },
-      departmentId ? { departmentId: Number(departmentId) } : undefined,
+      departmentId ? { departmentId: departmentId } : undefined,
     ),
   });
 
@@ -606,7 +607,7 @@ async function markNoShows({ user, date, departmentId }) {
 /** Consultation history of a patient, newest first. */
 async function patientHistory({ user, patientId, query = {} }) {
   const { page, limit, offset } = getPagination(query);
-  if (roleNameOf(user) === 'PATIENT' && Number(user.patientId) !== Number(patientId)) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(user.patientId, patientId)) {
     throw AppError.forbidden('You are not authorised to view this history');
   }
 
@@ -642,7 +643,7 @@ async function followUps({ user, query = {} }) {
 
 async function statistics({ query = {} }) {
   const day = query.date || toDateOnly();
-  const where = combineWhere({ appointmentDate: day }, query.departmentId ? { departmentId: Number(query.departmentId) } : undefined);
+  const where = combineWhere({ appointmentDate: day }, query.departmentId ? { departmentId: query.departmentId } : undefined);
 
   const [total, byStatus, byDepartment] = await Promise.all([
     Appointment.count({ where }),

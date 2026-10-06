@@ -6,6 +6,7 @@ const { searchWhere, combineWhere } = require('../utils/queryHelpers');
 const { roleNameOf } = require('../utils/accessControl');
 const { EVENTS } = require('../realtime/events');
 const realtime = require('../realtime/socket');
+const { sameId } = require('../utils/ids');
 const {
   Conversation,
   ConversationParticipant,
@@ -60,7 +61,7 @@ async function addParticipants({ conversationId, userIds, roleInConversation = '
 async function startConversation({ user, data }) {
   const patient = await Patient.findByPk(data.patientId);
   if (!patient) throw AppError.notFound('Patient not found');
-  if (roleNameOf(user) === 'PATIENT' && Number(patient.id) !== Number(user.patientId)) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(patient.id, user.patientId)) {
     throw AppError.forbidden('You cannot start a conversation for another patient');
   }
 
@@ -80,10 +81,10 @@ async function startConversation({ user, data }) {
   if (roleNameOf(user) === 'PATIENT') {
     // A patient cannot silently pull staff into a thread; staff are added by
     // care-team assignment. Only the patient themselves is added here.
-    const staffIds = (data.participantIds || []).filter((id) => Number(id) !== Number(user.id));
+    const staffIds = (data.participantIds || []).filter((id) => !sameId(id, user.id));
     if (staffIds.length) {
       const allowed = await participantIdsForPatient(patient.id);
-      const unauthorised = staffIds.filter((id) => !allowed.includes(Number(id)));
+      const unauthorised = staffIds.filter((id) => !allowed.includes(id));
       if (unauthorised.length) throw AppError.forbidden('You cannot add users to this conversation');
     }
   }
@@ -143,7 +144,7 @@ async function participantIdsForPatient(patientId) {
   const recorderIds = records.map((r) => r.recordedBy).filter(Boolean);
 
   return Array.from(
-    new Set([...doctors.map((d) => Number(d.userId)), ...recorderIds.map(Number), ...(await adminUserIds())]),
+    new Set([...doctors.map((d) => d.userId), ...recorderIds.map(String), ...(await adminUserIds())]),
   );
 }
 
@@ -190,9 +191,9 @@ async function listConversations({ user, query = {} }) {
   const conversations = await Promise.all(
     rows.map(async (conversation) => {
       const plain = conversation.get({ plain: true });
-      const mine = (plain.participants || []).find((p) => Number(p.userId) === Number(user.id));
+      const mine = (plain.participants || []).find((p) => sameId(p.userId, user.id));
       const others = (plain.participants || [])
-        .filter((p) => Number(p.userId) !== Number(user.id))
+        .filter((p) => !sameId(p.userId, user.id))
         .map((p) => ({
           userId: p.userId,
           name: p.user ? `${p.user.firstName} ${p.user.lastName}` : 'Unknown',
@@ -350,13 +351,13 @@ async function markRead({ user, id, messageId }) {
 
   const where = combineWhere(
     { conversationId: id, senderId: { [Op.ne]: user.id } },
-    messageId ? { id: { [Op.lt]: Number(messageId) } } : undefined,
+    messageId ? { id: { [Op.lt]: messageId } } : undefined,
   );
 
   const messages = await Message.findAll({ where, attributes: ['id', 'readBy'] });
   for (const message of messages) {
     const readBy = Array.isArray(message.readBy) ? message.readBy : [];
-    if (readBy.map(Number).includes(Number(user.id))) continue;
+    if (readBy.map(String).includes(user.id)) continue;
     // eslint-disable-next-line no-await-in-loop
     await message.update({ readBy: [...readBy, user.id] });
   }

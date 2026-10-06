@@ -105,7 +105,8 @@ describe('auth: credential lookup (database)', () => {
   it('reports the permission list through me()', async () => {
     if (!loaded()) return;
 
-    const profile = await authService.me(1);
+    const superAdmin = await User.findOne({ where: { email: 'superadmin@hospital.test' } });
+    const profile = await authService.me(superAdmin.id);
 
     expect(profile.permissions.length).toBeGreaterThan(0);
     expect(profile.passwordHash).toBeUndefined();

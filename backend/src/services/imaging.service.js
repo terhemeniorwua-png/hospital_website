@@ -10,6 +10,7 @@ const medicalRecordService = require('./medicalRecord.service');
 const { getPagination, getSort, buildPaginationMeta, withSortable } = require('../utils/pagination');
 const { searchWhere, combineWhere } = require('../utils/queryHelpers');
 const { ImagingOrder, Patient, User, Consultation } = require('../models');
+const { sameId } = require('../utils/ids');
 
 /**
  * Imaging requests and radiology reports.
@@ -49,7 +50,7 @@ async function list({ user, query = {} }) {
   const where = combineWhere(
     roleNameOf(user) === 'PATIENT' ? { patientId: user.patientId ?? -1 } : undefined,
     statuses ? { status: { [Op.in]: statuses } } : undefined,
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
     query.priority ? { priority: query.priority } : undefined,
     searchWhere(query.search, [['orderNumber', 'string'], ['imagingType', 'string'], ['bodyPart', 'string']]),
   );
@@ -79,7 +80,7 @@ async function getById({ user, id }) {
   const order = await ImagingOrder.findByPk(id, { include: IMAGING_INCLUDES });
   if (!order) throw AppError.notFound('Imaging order not found');
   if (roleNameOf(user) === 'PATIENT') {
-    if (Number(order.patientId) !== Number(user.patientId)) {
+    if (!sameId(order.patientId, user.patientId)) {
       throw AppError.forbidden('You are not authorised to view this imaging report');
     }
     return present(redactUnpublished(order));

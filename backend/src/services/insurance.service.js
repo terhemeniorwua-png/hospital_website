@@ -11,6 +11,7 @@ const realtime = require('../realtime/socket');
 const notificationService = require('./notification.service');
 const auditService = require('./audit.service');
 const billingService = require('./billing.service');
+const { sameId } = require('../utils/ids');
 const {
   InsuranceProvider,
   InsurancePolicy,
@@ -102,8 +103,8 @@ async function listPolicies({ user, query = {} }) {
 
   const where = combineWhere(
     roleNameOf(user) === 'PATIENT' ? { patientId: user.patientId ?? -1 } : undefined,
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
-    query.providerId ? { providerId: Number(query.providerId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
+    query.providerId ? { providerId: query.providerId } : undefined,
     query.status ? { status: query.status } : undefined,
     query.activeOnly === true ? { status: 'ACTIVE', endDate: { [Op.gte]: new Date() } } : undefined,
     searchWhere(query.search, [['policyNumber', 'string'], ['planName', 'string']]),
@@ -133,7 +134,7 @@ async function getPolicy({ user, id }) {
     ],
   });
   if (!policy) throw AppError.notFound('Insurance policy not found');
-  if (roleNameOf(user) === 'PATIENT' && Number(policy.patientId) !== Number(user.patientId)) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(policy.patientId, user.patientId)) {
     throw AppError.forbidden('You are not authorised to view this policy');
   }
 
@@ -209,7 +210,7 @@ async function createPolicy({ user, data }) {
 async function coverageCheck({ user, data }) {
   const policy = await InsurancePolicy.findByPk(data.policyId);
   if (!policy) throw AppError.notFound('Insurance policy not found');
-  if (roleNameOf(user) === 'PATIENT' && Number(policy.patientId) !== Number(user.patientId)) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(policy.patientId, user.patientId)) {
     throw AppError.forbidden('You are not authorised to view this policy');
   }
 
@@ -243,9 +244,9 @@ async function listClaims({ user, query = {} }) {
   const where = combineWhere(
     roleNameOf(user) === 'PATIENT' ? { patientId: user.patientId ?? -1 } : undefined,
     statuses ? { status: { [Op.in]: statuses } } : undefined,
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
-    query.policyId ? { policyId: Number(query.policyId) } : undefined,
-    query.invoiceId ? { invoiceId: Number(query.invoiceId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
+    query.policyId ? { policyId: query.policyId } : undefined,
+    query.invoiceId ? { invoiceId: query.invoiceId } : undefined,
     searchWhere(query.search, [['claimNumber', 'string']]),
   );
 
@@ -266,7 +267,7 @@ async function getClaim({ user, id }) {
     include: [...CLAIM_INCLUDES, { model: User, as: 'reviewedByUser', attributes: ['id', 'firstName', 'lastName'] }],
   });
   if (!claim) throw AppError.notFound('Insurance claim not found');
-  if (roleNameOf(user) === 'PATIENT' && Number(claim.patientId) !== Number(user.patientId)) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(claim.patientId, user.patientId)) {
     throw AppError.forbidden('You are not authorised to view this claim');
   }
   return claim.get({ plain: true });
@@ -289,7 +290,7 @@ async function submitClaim({ user, data }) {
 
   const policy = await InsurancePolicy.findByPk(data.policyId);
   if (!policy) throw AppError.notFound('Insurance policy not found');
-  if (Number(policy.patientId) !== Number(invoice.patientId)) {
+  if (!sameId(policy.patientId, invoice.patientId)) {
     throw AppError.badRequest('That policy belongs to a different patient');
   }
   if (!isPolicyValid(policy)) throw AppError.badRequest('The policy is not currently valid');

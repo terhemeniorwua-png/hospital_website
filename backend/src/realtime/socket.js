@@ -18,6 +18,7 @@ const { verifyAccessToken } = require('../utils/jwt');
 const { roleNameOf } = require('../utils/accessControl');
 const { ROLES } = require('../config/constants');
 const { EVENTS, ROOMS } = require('./events');
+const { sameId } = require('../utils/ids');
 
 let io = null;
 
@@ -86,7 +87,7 @@ async function canJoinDepartment(user, departmentId) {
 }
 
 async function canJoinPatient(user, patientId) {
-  if (roleNameOf(user) === ROLES.PATIENT) return Number(user.patientId) === Number(patientId);
+  if (roleNameOf(user) === ROLES.PATIENT) return sameId(user.patientId, patientId);
   return STAFF_ROLES.includes(roleNameOf(user));
 }
 
@@ -94,7 +95,7 @@ async function canJoinAppointment(user, appointmentId) {
   const { Appointment } = getModels();
   const appointment = await Appointment.findByPk(appointmentId, { attributes: ['id', 'patientId'] });
   if (!appointment) return false;
-  if (roleNameOf(user) === ROLES.PATIENT) return Number(user.patientId) === Number(appointment.patientId);
+  if (roleNameOf(user) === ROLES.PATIENT) return sameId(user.patientId, appointment.patientId);
   return STAFF_ROLES.includes(roleNameOf(user));
 }
 
@@ -211,7 +212,7 @@ function attachRealtime(httpServer) {
 
     socket.on('conversation:join', async (payload, ack) => {
       try {
-        const conversationId = Number(payload?.conversationId ?? payload);
+        const conversationId = payload?.conversationId ?? payload;
         const rooms = await SUBSCRIBERS.conversation(user, conversationId);
         rooms.forEach((room) => socket.join(room));
         if (typeof ack === 'function') ack({ success: true, rooms });

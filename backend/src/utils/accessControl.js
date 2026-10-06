@@ -1,6 +1,7 @@
 const { Op } = require('sequelize');
 const { ROLES } = require('../config/constants');
 const { CLINICAL_ROLES } = require('../config/permissions');
+const { sameId } = require('./ids');
 
 /**
  * Ownership / RBAC assertions for patient-scoped resources.
@@ -51,7 +52,7 @@ function assertPatientAccess(user, patientRow, options = {}) {
 
   if (roleNameOf(user) === ROLES.PATIENT) {
     const ownId = user.patientId ?? null;
-    if (patientRow && ownId && Number(patientRow.id) === Number(ownId)) {
+    if (patientRow && ownId && sameId(patientRow.id, ownId)) {
       return { ok: true, scope: 'owner' };
     }
     return {

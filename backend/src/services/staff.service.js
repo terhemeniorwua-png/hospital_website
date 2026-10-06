@@ -47,9 +47,9 @@ async function list({ query = {} }) {
 
   const where = combineWhere(
     query.role ? { role: { name: query.role } } : undefined,
-    query.roleId ? { roleId: Number(query.roleId) } : undefined,
+    query.roleId ? { roleId: query.roleId } : undefined,
     query.status ? { status: query.status } : undefined,
-    query.departmentId ? { assignedDepartments: { id: Number(query.departmentId) } } : undefined,
+    query.departmentId ? { assignedDepartments: { id: query.departmentId } } : undefined,
     searchWhere(query.search, [
       ['firstName', 'string'],
       ['lastName', 'string'],
@@ -359,7 +359,7 @@ async function directory({ query = {} }) {
             attributes: ['id', 'name', 'code'],
             through: { attributes: [] },
             required: true,
-            where: { id: Number(query.departmentId) },
+            where: { id: query.departmentId },
           }
         : {
             model: Department,

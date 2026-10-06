@@ -50,7 +50,7 @@ async function notify({
   try {
     const { Notification, User, Role } = require('../models');
 
-    const recipients = new Set(userIds.filter(Boolean).map(Number));
+    const recipients = new Set(userIds.filter(Boolean).map(String));
 
     if (patientId) {
       const userId = await userIdForPatient(patientId);

@@ -104,7 +104,7 @@ async function appointmentsTrend({ days = 14, departmentId } = {}) {
 
   const where = combineWhere(
     { appointmentDate: { [Op.gte]: from } },
-    departmentId ? { departmentId: Number(departmentId) } : undefined,
+    departmentId ? { departmentId: departmentId } : undefined,
   );
 
   const rows = await Appointment.findAll({
@@ -122,7 +122,7 @@ async function appointmentsTrend({ days = 14, departmentId } = {}) {
 async function bedOccupancy({ wardId } = {}) {
   const where = combineWhere(
     { status: { [Op.in]: ['ADMITTED', 'TRANSFERRED'] } },
-    wardId ? { wardId: Number(wardId) } : undefined,
+    wardId ? { wardId: wardId } : undefined,
   );
 
   const [rows, wards] = await Promise.all([
@@ -134,7 +134,7 @@ async function bedOccupancy({ wardId } = {}) {
     }),
     Ward.findAll({
       attributes: ['id', 'name', 'code', 'totalBeds'],
-      where: wardId ? { id: Number(wardId) } : undefined,
+      where: wardId ? { id: wardId } : undefined,
       order: [['name', 'ASC']],
       raw: true,
     }),
@@ -246,8 +246,8 @@ async function auditLog({ user, query = {} }) {
   const where = combineWhere(
     actions ? { action: { [Op.in]: actions } } : undefined,
     resources ? { resource: { [Op.in]: resources } } : undefined,
-    query.userId ? { userId: Number(query.userId) } : undefined,
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
+    query.userId ? { userId: query.userId } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
     query.from ? { timestamp: { [Op.gte]: new Date(query.from) } } : undefined,
     query.to ? { timestamp: { [Op.lte]: new Date(query.to) } } : undefined,
     query.ipAddress ? { ipAddress: query.ipAddress } : undefined,

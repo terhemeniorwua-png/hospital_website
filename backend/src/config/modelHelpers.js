@@ -23,13 +23,13 @@ const timestamps = {
 
 /** Optional created-by / updated-by audit stamps. */
 const actorStamps = (User) => ({
-  createdBy: { type: DataTypes.INTEGER, references: { model: User, key: 'id' }, onDelete: 'SET NULL' },
-  updatedBy: { type: DataTypes.INTEGER, references: { model: User, key: 'id' }, onDelete: 'SET NULL' },
+  createdBy: { type: DataTypes.UUID, references: { model: User, key: 'id' }, onDelete: 'SET NULL' },
+  updatedBy: { type: DataTypes.UUID, references: { model: User, key: 'id' }, onDelete: 'SET NULL' },
 });
 
 /** Soft-ish "belongs to a user" reference used across clinical tables. */
 const userRef = (User, { allowNull = true, as } = {}) => ({
-  type: DataTypes.INTEGER,
+  type: DataTypes.UUID,
   allowNull,
   ...(as ? { as } : {}),
   references: { model: User, key: 'id' },

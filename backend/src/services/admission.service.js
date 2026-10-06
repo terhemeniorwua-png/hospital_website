@@ -12,6 +12,7 @@ const { EVENTS } = require('../realtime/events');
 const realtime = require('../realtime/socket');
 const notificationService = require('./notification.service');
 const medicalRecordService = require('./medicalRecord.service');
+const { sameId } = require('../utils/ids');
 const {
   Ward,
   Room,
@@ -130,8 +131,8 @@ async function listBeds({ query = {} }) {
   const { page, limit, offset } = getPagination(query);
 
   const where = combineWhere(
-    query.wardId ? { wardId: Number(query.wardId) } : undefined,
-    query.roomId ? { roomId: Number(query.roomId) } : undefined,
+    query.wardId ? { wardId: query.wardId } : undefined,
+    query.roomId ? { roomId: query.roomId } : undefined,
     query.status ? { status: query.status } : undefined,
     query.availableOnly === true ? { status: BED_STATUS.AVAILABLE, isActive: true } : undefined,
     searchWhere(query.search, [['bedNumber', 'string'], ['shelfLocation', 'string']]),
@@ -170,7 +171,7 @@ async function listBeds({ query = {} }) {
 async function findAvailableBed({ wardId, roomType }) {
   const beds = await Bed.findAll({
     where: combineWhere(
-      { wardId: Number(wardId), status: BED_STATUS.AVAILABLE, isActive: true },
+      { wardId: wardId, status: BED_STATUS.AVAILABLE, isActive: true },
       roomType ? { room: { roomType } } : undefined,
     ),
     include: [{ model: Room, as: 'room', attributes: ['id', 'roomNumber', 'roomType'] }],
@@ -210,9 +211,9 @@ async function listAdmissions({ user, query = {} }) {
   const where = combineWhere(
     roleNameOf(user) === 'PATIENT' ? { patientId: user.patientId ?? -1 } : undefined,
     statuses ? { status: { [Op.in]: statuses } } : undefined,
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
-    query.wardId ? { wardId: Number(query.wardId) } : undefined,
-    query.bedId ? { bedId: Number(query.bedId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
+    query.wardId ? { wardId: query.wardId } : undefined,
+    query.bedId ? { bedId: query.bedId } : undefined,
     query.active === true ? { status: { [Op.in]: ACTIVE_ADMISSION_STATUSES } } : undefined,
     query.date ? { admittedAt: { [Op.gte]: new Date(`${query.date}T00:00:00Z`) } } : undefined,
     searchWhere(query.search, [['admissionNumber', 'string'], ['diagnosis', 'string']]),
@@ -259,7 +260,7 @@ async function getAdmission({ user, id }) {
     ],
   });
   if (!admission) throw AppError.notFound('Admission not found');
-  if (roleNameOf(user) === 'PATIENT' && Number(admission.patientId) !== Number(user.patientId)) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(admission.patientId, user.patientId)) {
     throw AppError.forbidden('You are not authorised to view this admission');
   }
   return present(admission);
@@ -396,7 +397,7 @@ async function transfer({ user, id, data }) {
     if (!bed) throw AppError.conflict('No free bed is available in the destination ward');
   }
 
-  if (Number(bed.id) === Number(admission.bedId)) {
+  if (sameId(bed.id, admission.bedId)) {
     throw AppError.badRequest('The patient is already in that bed');
   }
 
@@ -611,7 +612,7 @@ async function buildDischargeSummary(admission, data = {}) {
 async function getDischargeSummary({ user, id }) {
   const admission = await Admission.findByPk(id, { include: [{ model: Patient, as: 'patient' }] });
   if (!admission) throw AppError.notFound('Admission not found');
-  if (roleNameOf(user) === 'PATIENT' && Number(admission.patientId) !== Number(user.patientId)) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(admission.patientId, user.patientId)) {
     throw AppError.forbidden('You are not authorised to view this summary');
   }
 
@@ -628,7 +629,7 @@ async function statistics({ query = {} }) {
   const day = query.date || toDateOnly();
 
   const [occupancy, admitted, discharged, activeAdmissions, byWard] = await Promise.all([
-    bedCounts(query.wardId ? Number(query.wardId) : undefined),
+    bedCounts(query.wardId ? query.wardId : undefined),
     Admission.count({ where: { admittedAt: { [Op.gte]: new Date(`${day}T00:00:00Z`) } } }),
     Admission.count({ where: { dischargedAt: { [Op.gte]: new Date(`${day}T00:00:00Z`) } } }),
     Admission.count({ where: { status: { [Op.in]: ACTIVE_ADMISSION_STATUSES } } }),

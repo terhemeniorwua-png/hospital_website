@@ -3,7 +3,8 @@ const { ROLES, GENDERS, BLOOD_GROUPS } = require('../config/constants');
 
 const email = z.string().trim().toLowerCase().email('Enter a valid email address');
 const password = z.string().min(8, 'Password must be at least 8 characters').max(72);
-const id = z.coerce.number().int().positive('Invalid id');
+/** Every primary/foreign key in the schema is a UUID, so ids validate as one. */
+const id = z.uuid('Invalid id');
 
 const phone = z
   .string()

@@ -134,7 +134,7 @@ async function removeStaff({ departmentId, userId }) {
 async function listStaff({ departmentId, query = {} }) {
   const { page, limit, offset } = getPagination(query);
   const where = combineWhere(
-    departmentId ? { departmentId: Number(departmentId) } : undefined,
+    departmentId ? { departmentId: departmentId } : undefined,
     searchWhere(query.search, [['userFirstName', 'string'], ['userLastName', 'string'], ['userEmail', 'string']]),
   );
 

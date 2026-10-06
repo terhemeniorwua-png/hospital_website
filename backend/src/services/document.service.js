@@ -9,6 +9,7 @@ const { roleNameOf } = require('../utils/accessControl');
 const { MEDICAL_RECORD_TYPES } = require('../config/constants');
 const env = require('../config/env');
 const { Document, Patient, User } = require('../models');
+const { sameId } = require('../utils/ids');
 
 /**
  * Document repository: secure uploads, patient-scoped access and downloads.
@@ -48,10 +49,10 @@ async function list({ user, query = {} }) {
 
   const where = combineWhere(
     roleNameOf(user) === 'PATIENT' ? { patientId: user.patientId ?? -1 } : undefined,
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
     query.category ? { category: query.category } : undefined,
     query.referenceType ? { referenceType: query.referenceType } : undefined,
-    query.referenceId ? { referenceId: Number(query.referenceId) } : undefined,
+    query.referenceId ? { referenceId: query.referenceId } : undefined,
     query.private !== undefined ? { isPrivate: Boolean(query.private) } : undefined,
     searchWhere(query.search, [['title', 'string'], ['originalName', 'string']]),
   );
@@ -72,10 +73,10 @@ async function getById({ user, id }) {
   const document = await Document.findByPk(id, { include: DOCUMENT_INCLUDES });
   if (!document) throw AppError.notFound('Document not found');
   if (roleNameOf(user) === 'PATIENT') {
-    if (document.isPrivate && Number(document.patientId) !== Number(user.patientId)) {
+    if (document.isPrivate && !sameId(document.patientId, user.patientId)) {
       throw AppError.forbidden('This document is private');
     }
-    if (Number(document.patientId) !== Number(user.patientId)) {
+    if (!sameId(document.patientId, user.patientId)) {
       throw AppError.forbidden('You are not authorised to view this document');
     }
   }
@@ -90,7 +91,7 @@ async function create({ user, file, data }) {
   if (data.patientId && !patient) throw AppError.notFound('Patient not found');
 
   if (roleNameOf(user) === 'PATIENT') {
-    if (data.patientId && Number(data.patientId) !== Number(user.patientId)) {
+    if (data.patientId && !sameId(data.patientId, user.patientId)) {
       throw AppError.forbidden('You cannot upload to another patient');
     }
     if (!patient && user.patientId) {
@@ -152,7 +153,7 @@ async function getFilePath({ user, id }) {
   const document = await Document.findByPk(id);
   if (!document) throw AppError.notFound('Document not found');
   if (roleNameOf(user) === 'PATIENT') {
-    if (Number(document.patientId) !== Number(user.patientId)) throw AppError.forbidden('You cannot access this document');
+    if (!sameId(document.patientId, user.patientId)) throw AppError.forbidden('You cannot access this document');
   }
 
   const abs = path.join(env.UPLOAD_DIR, document.storagePath);
@@ -167,7 +168,7 @@ async function verifyChecksum({ user, id, checksum }) {
   const document = await Document.findByPk(id);
   if (!document) throw AppError.notFound('Document not found');
   if (roleNameOf(user) === 'PATIENT') {
-    if (Number(document.patientId) !== Number(user.patientId)) throw AppError.forbidden('You cannot access this document');
+    if (!sameId(document.patientId, user.patientId)) throw AppError.forbidden('You cannot access this document');
   }
   const abs = path.join(env.UPLOAD_DIR, document.storagePath);
   if (!fs.existsSync(abs)) throw AppError.notFound('Document file no longer exists');

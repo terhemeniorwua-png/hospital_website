@@ -9,6 +9,7 @@ const realtime = require('../realtime/socket');
 const notificationService = require('./notification.service');
 const medicalRecordService = require('./medicalRecord.service');
 const consultationService = require('./consultation.service');
+const { sameId } = require('../utils/ids');
 const {
   NursingNote,
   MedicationAdministration,
@@ -42,8 +43,8 @@ async function assignedPatients({ user, query = {} }) {
 
   const where = combineWhere(
     { status: { [Op.in]: ['ADMITTED', 'TRANSFERRED'] } },
-    query.wardId ? { wardId: Number(query.wardId) } : undefined,
-    query.bedId ? { bedId: Number(query.bedId) } : undefined,
+    query.wardId ? { wardId: query.wardId } : undefined,
+    query.bedId ? { bedId: query.bedId } : undefined,
     searchWhere(query.search, [['patient.firstName', 'string'], ['patient.lastName', 'string']]),
   );
 
@@ -101,9 +102,9 @@ async function listNotes({ user, query = {} }) {
 
   const where = combineWhere(
     scopeFor(user),
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
-    query.admissionId ? { admissionId: Number(query.admissionId) } : undefined,
-    query.wardId ? { wardId: Number(query.wardId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
+    query.admissionId ? { admissionId: query.admissionId } : undefined,
+    query.wardId ? { wardId: query.wardId } : undefined,
     query.shift ? { shift: query.shift } : undefined,
     query.critical === true ? { isCritical: true } : undefined,
     query.date ? { recordedAt: { [Op.gte]: new Date(`${query.date}T00:00:00Z`) } } : undefined,
@@ -130,7 +131,7 @@ async function createNote({ user, data }) {
   const admission = data.admissionId ? await Admission.findByPk(data.admissionId) : null;
   if (data.admissionId && !admission) throw AppError.notFound('Admission not found');
 
-  const patientId = admission?.patientId ?? Number(data.patientId);
+  const patientId = admission?.patientId ?? data.patientId;
   if (!patientId) throw AppError.badRequest('patientId or admissionId is required');
 
   const note = await NursingNote.create({
@@ -180,8 +181,8 @@ async function listAdministrations({ user, query = {} }) {
 
   const where = combineWhere(
     scopeFor(user),
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
-    query.admissionId ? { admissionId: Number(query.admissionId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
+    query.admissionId ? { admissionId: query.admissionId } : undefined,
     query.status ? { status: query.status } : undefined,
     query.date ? { scheduledAt: { [Op.gte]: new Date(`${query.date}T00:00:00Z`) } } : undefined,
   );
@@ -216,7 +217,7 @@ async function createSchedule({ user, data }) {
 
   const admission = await Admission.findByPk(data.admissionId);
   if (!admission) throw AppError.notFound('Admission not found');
-  if (Number(admission.patientId) !== Number(prescription.patientId)) {
+  if (!sameId(admission.patientId, prescription.patientId)) {
     throw AppError.badRequest('That prescription is for a different patient');
   }
 
@@ -308,7 +309,7 @@ async function recordVitals({ user, data }) {
   const admission = data.admissionId ? await Admission.findByPk(data.admissionId) : null;
   if (data.admissionId && !admission) throw AppError.notFound('Admission not found');
 
-  const patientId = admission?.patientId ?? Number(data.patientId);
+  const patientId = admission?.patientId ?? data.patientId;
   if (!patientId) throw AppError.badRequest('patientId or admissionId is required');
   if (!isClinicalStaff(user)) throw AppError.forbidden('Only clinical staff may record observations');
 
@@ -345,8 +346,8 @@ async function listVitals({ user, query = {} }) {
 
   const where = combineWhere(
     scopeFor(user),
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
-    query.admissionId ? { admissionId: Number(query.admissionId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
+    query.admissionId ? { admissionId: query.admissionId } : undefined,
     query.date ? { recordedAt: { [Op.gte]: new Date(`${query.date}T00:00:00Z`) } } : undefined,
   );
 
@@ -363,7 +364,7 @@ async function listVitals({ user, query = {} }) {
 
 /** The doctor's active orders for a patient, shown to the nurse. */
 async function doctorOrders({ user, query = {} }) {
-  const patientId = roleNameOf(user) === 'PATIENT' ? user.patientId : Number(query.patientId);
+  const patientId = roleNameOf(user) === 'PATIENT' ? user.patientId : query.patientId;
   if (!patientId) throw AppError.badRequest('patientId is required');
 
   const [prescriptions, labOrders, imagingOrders, careTasks] = await Promise.all([

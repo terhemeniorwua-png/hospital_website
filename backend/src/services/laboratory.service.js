@@ -11,6 +11,7 @@ const { EVENTS } = require('../realtime/events');
 const realtime = require('../realtime/socket');
 const notificationService = require('./notification.service');
 const medicalRecordService = require('./medicalRecord.service');
+const { sameId } = require('../utils/ids');
 const {
   LaboratoryOrder,
   LaboratoryOrderItem,
@@ -98,7 +99,7 @@ async function listOrders({ user, query = {} }) {
   const where = combineWhere(
     scopeFor(user),
     statuses ? { status: { [Op.in]: statuses } } : undefined,
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
     query.priority ? { priority: query.priority } : undefined,
     query.unpublished === true ? { status: { [Op.in]: ['PROCESSING', 'COMPLETED'] } } : undefined,
     query.date ? { orderedAt: { [Op.gte]: new Date(`${query.date}T00:00:00Z`) } } : undefined,
@@ -120,7 +121,7 @@ async function listOrders({ user, query = {} }) {
 async function getOrder({ user, id }) {
   const order = await LaboratoryOrder.findByPk(id, { include: ORDER_INCLUDES });
   if (!order) throw AppError.notFound('Laboratory order not found');
-  if (roleNameOf(user) === 'PATIENT' && Number(order.patientId) !== Number(user.patientId)) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(order.patientId, user.patientId)) {
     throw AppError.forbidden('You are not authorised to view this laboratory order');
   }
 
@@ -163,7 +164,7 @@ async function createOrder({ user, data }) {
   if (!patient) throw AppError.notFound('Patient not found');
 
   const tests = await LaboratoryTest.findAll({
-    where: { id: { [Op.in]: data.testIds.map(Number) }, isActive: true },
+    where: { id: { [Op.in]: data.testIds.map(String) }, isActive: true },
   });
   if (!tests.length) throw AppError.badRequest('None of the requested tests exist or are active');
   if (tests.length !== data.testIds.length) {
@@ -312,7 +313,7 @@ async function recordResult({ user, orderId, data }) {
   }
 
   const item = await LaboratoryOrderItem.findByPk(data.orderItemId);
-  if (!item || Number(item.orderId) !== Number(order.id)) {
+  if (!item || !sameId(item.orderId, order.id)) {
     throw AppError.notFound('Test item not found on this order');
   }
 
@@ -426,8 +427,8 @@ async function listResults({ user, query = {} }) {
   const where = combineWhere(
     scopeFor(user),
     roleNameOf(user) === 'PATIENT' ? { isPublished: true } : query.published === undefined ? undefined : { isPublished: query.published },
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
-    query.orderId ? { orderId: Number(query.orderId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
+    query.orderId ? { orderId: query.orderId } : undefined,
     query.flag ? { flag: query.flag } : undefined,
   );
 

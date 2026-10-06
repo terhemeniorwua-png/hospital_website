@@ -10,6 +10,7 @@
  */
 process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
+const { Op } = require('sequelize');
 const createApp = require('../src/app');
 const env = require('../src/config/env');
 
@@ -25,38 +26,65 @@ const ACCOUNTS = [
   ['reception', 'reception@hospital.test'],
 ];
 
+/** A uuid that will never exist, used for the foreign-record checks. */
+const UNKNOWN_ID = '00000000-0000-4000-8000-000000000000';
+
+/**
+ * Ids are uuids, so the checks below are built from real rows instead of
+ * hard-coded `1`s. Resolved once against the seeded database.
+ */
+async function resolveIds() {
+  const { Patient, Doctor, Department, LaboratoryTest } = require('../src/models');
+  const [patient, doctor, department, test] = await Promise.all([
+    Patient.findOne({ attributes: ['id'] }),
+    Doctor.findOne({ attributes: ['id', 'departmentId'], where: { departmentId: { [Op.ne]: null } } }),
+    Department.findOne({ attributes: ['id'] }),
+    LaboratoryTest.findOne({ attributes: ['id'] }),
+  ]);
+  const ids = {
+    patientId: patient && patient.id,
+    doctorId: doctor && doctor.id,
+    departmentId: (doctor && doctor.departmentId) || (department && department.id),
+    testId: test && test.id,
+  };
+  if (Object.values(ids).some((value) => !value)) {
+    throw new Error(`seeded database is missing base records: ${JSON.stringify(ids)}`);
+  }
+  return ids;
+}
+
 /** [method, path, expectedStatus, permissionContext] */
-const CHECKS = [
+const checksFor = ({ patientId, doctorId, departmentId, testId }) => [
   ['GET', '/patients?limit=5', 200],
   ['GET', '/patients/statistics', 200],
   ['GET', '/patients/search?q=chi', 200],
-  ['GET', '/patients/1', 200],
-  ['GET', '/patients/1/allergies', 200],
-  ['GET', '/patients/1/conditions', 200],
-  ['GET', '/patients/1/history', 200],
+  ['GET', `/patients/${patientId}`, 200],
+  ['GET', `/patients/${patientId}/allergies`, 200],
+  ['GET', `/patients/${patientId}/conditions`, 200],
+  ['GET', `/patients/${patientId}/history`, 200],
   ['GET', '/departments', 200],
   ['GET', '/departments/overview', 200],
-  ['GET', '/departments/1', 200],
-  ['GET', '/departments/1/staff', 200],
+  ['GET', `/departments/${departmentId}`, 200],
+  ['GET', `/departments/${departmentId}/staff`, 200],
   ['GET', '/staff/directory', 200],
   ['GET', '/staff/roles', 200],
   ['GET', '/appointments?limit=5', 200],
   ['GET', '/appointments/statistics', 200],
-  ['GET', `/appointments/availability?doctorId=1&date=${TOMORROW}`, 200],
-  ['GET', `/appointments/doctors?departmentId=1&date=${TOMORROW}`, 200],
+  ['GET', `/appointments/availability?doctorId=${doctorId}&date=${TOMORROW}`, 200],
+  ['GET', `/appointments/doctors?departmentId=${departmentId}&date=${TOMORROW}`, 200],
   ['GET', '/appointments/follow-ups', 200],
   ['GET', '/appointments/statuses', 200],
-  ['GET', '/queue/board?departmentId=1', 200],
+  ['GET', `/queue/board?departmentId=${departmentId}`, 200],
   ['GET', '/queue?limit=5', 200],
   ['GET', '/queue/statistics', 200],
   ['GET', '/consultations?limit=5', 200],
   ['GET', '/consultations/statistics', 200],
-  ['GET', '/medical-records/1/timeline', 200],
-  ['GET', '/medical-records/1/summary', 200],
-  ['GET', '/medical-records/1/records?limit=5', 200],
-  ['GET', '/medical-records/1/export?format=json', 200],
+  ['GET', `/medical-records/${patientId}/timeline`, 200],
+  ['GET', `/medical-records/${patientId}/summary`, 200],
+  ['GET', `/medical-records/${patientId}/records?limit=5`, 200],
+  ['GET', `/medical-records/${patientId}/export?format=json`, 200],
   ['GET', '/laboratory/tests?limit=5', 200],
-  ['GET', '/laboratory/tests/1', 200],
+  ['GET', `/laboratory/tests/${testId}`, 200],
   ['GET', '/laboratory?limit=5', 200],
   ['GET', '/laboratory/statistics', 200],
   ['GET', '/laboratory/results?limit=5', 200],
@@ -83,7 +111,7 @@ const CHECKS = [
   ['GET', '/billing?limit=5', 200],
   ['GET', '/billing/payments?limit=5', 200],
   ['GET', '/billing/statistics', 200],
-  ['GET', '/billing/statement/1', 200],
+  ['GET', `/billing/statement/${patientId}`, 200],
   ['GET', '/insurance/providers', 200],
   ['GET', '/insurance/policies', 200],
   ['GET', '/insurance/claims?limit=5', 200],
@@ -126,10 +154,13 @@ async function main() {
   let passed = 0;
   const failures = [];
 
+  let checks = [];
+
   try {
+    checks = checksFor(await resolveIds());
     const token = await login(base, ACCOUNTS[0][1]);
 
-    for (const [method, routePath, expected] of CHECKS) {
+    for (const [method, routePath, expected] of checks) {
       const response = await fetch(`${base}${routePath}`, {
         method,
         headers: { Authorization: `Bearer ${token}` },
@@ -159,11 +190,11 @@ async function main() {
 
     /* Patients must not see another patient's record. */
     const patientToken = await login(base, 'patient@hospital.test');
-    const foreign = await fetch(`${base}/medical-records/999/timeline`, {
+    const foreign = await fetch(`${base}/medical-records/${UNKNOWN_ID}/timeline`, {
       headers: { Authorization: `Bearer ${patientToken}` },
     });
     if (foreign.status === 403 || foreign.status === 404) passed += 1;
-    else failures.push(`patient isolation /medical-records/999 -> ${foreign.status}, expected 403/404`);
+    else failures.push(`patient isolation /medical-records/${UNKNOWN_ID} -> ${foreign.status}, expected 403/404`);
 
     /* A patient must not be able to create a patient. */
     const forbidden = await fetch(`${base}/patients`, {
@@ -177,6 +208,7 @@ async function main() {
     failures.push(`harness error: ${error.message}`);
   } finally {
     server.close();
+    await require('../src/models').sequelize.close();
   }
 
   if (failures.length) {
@@ -185,7 +217,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`\nAPI smoke OK: ${passed}/${CHECKS.length + 3} checks passed.`);
+  console.log(`\nAPI smoke OK: ${passed}/${checks.length + 3} checks passed.`);
 }
 
 main();

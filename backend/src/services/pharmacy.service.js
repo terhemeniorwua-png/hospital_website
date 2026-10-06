@@ -13,6 +13,7 @@ const { EVENTS } = require('../realtime/events');
 const realtime = require('../realtime/socket');
 const notificationService = require('./notification.service');
 const medicalRecordService = require('./medicalRecord.service');
+const { sameId } = require('../utils/ids');
 const {
   Prescription,
   PrescriptionItem,
@@ -82,9 +83,9 @@ async function list({ user, query = {} }) {
   const where = combineWhere(
     roleNameOf(user) === 'PATIENT' ? { patientId: user.patientId ?? -1 } : undefined,
     statuses ? { status: { [Op.in]: statuses } } : undefined,
-    query.patientId ? { patientId: Number(query.patientId) } : undefined,
-    query.doctorId ? { prescribedBy: Number(query.doctorId) } : undefined,
-    query.consultationId ? { consultationId: Number(query.consultationId) } : undefined,
+    query.patientId ? { patientId: query.patientId } : undefined,
+    query.doctorId ? { prescribedBy: query.doctorId } : undefined,
+    query.consultationId ? { consultationId: query.consultationId } : undefined,
     query.unverified === true ? { verifiedAt: null } : undefined,
     searchWhere(query.search, [['prescriptionNumber', 'string'], ['notes', 'string']]),
   );
@@ -116,7 +117,7 @@ async function getById({ user, id }) {
     ],
   });
   if (!prescription) throw AppError.notFound('Prescription not found');
-  if (roleNameOf(user) === 'PATIENT' && Number(prescription.patientId) !== Number(user.patientId)) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(prescription.patientId, user.patientId)) {
     throw AppError.forbidden('You are not authorised to view this prescription');
   }
 
@@ -137,7 +138,7 @@ async function create({ user, data }) {
   if (!patient) throw AppError.notFound('Patient not found');
 
   const medications = await Medication.findAll({
-    where: { id: { [Op.in]: data.items.map((item) => Number(item.medicationId)) }, isActive: true },
+    where: { id: { [Op.in]: data.items.map((item) => item.medicationId) }, isActive: true },
   });
   if (medications.length !== data.items.length) {
     throw AppError.badRequest('One or more medications are unavailable');
@@ -155,7 +156,7 @@ async function create({ user, data }) {
         status: PRESCRIPTION_STATUS.PENDING_VERIFICATION,
         notes: data.notes ?? null,
         totalPrice: round2(
-          data.items.reduce((sum, item) => sum + Number(item.quantity || 0) * Number(medicationMap.get(Number(item.medicationId)).unitPrice || 0), 0),
+          data.items.reduce((sum, item) => sum + Number(item.quantity || 0) * Number(medicationMap.get(item.medicationId).unitPrice || 0), 0),
         ),
         isBilled: false,
       },
@@ -164,7 +165,7 @@ async function create({ user, data }) {
 
     await PrescriptionItem.bulkCreate(
       data.items.map((item) => {
-        const medication = medicationMap.get(Number(item.medicationId));
+        const medication = medicationMap.get(item.medicationId);
         const quantity = Number(item.quantity || 0);
         return {
           prescriptionId: created.id,
@@ -275,7 +276,7 @@ async function dispense({ user, id, data }) {
   // stays outstanding so the prescription remains PARTIALLY_DISPENSED.
   const requested = new Map(
     (data.items || items.map((item) => ({ itemId: item.id, quantity: item.quantity }))).map((entry) => [
-      Number(entry.itemId ?? entry.prescriptionItemId),
+      entry.itemId ?? entry.prescriptionItemId,
       Number(entry.quantity ?? 0),
     ]),
   );
@@ -442,7 +443,7 @@ async function listInventory({ query = {} }) {
 
   const where = combineWhere(
     query.isActive === undefined ? { isActive: true } : { isActive: query.isActive },
-    query.medicationId ? { medicationId: Number(query.medicationId) } : undefined,
+    query.medicationId ? { medicationId: query.medicationId } : undefined,
     query.batchNumber ? { batchNumber: { [Op.iLike]: `%${query.batchNumber}%` } } : undefined,
     query.expiring ? { expiryDate: { [Op.between]: [today, expiryCutoff] } } : undefined,
     query.expired ? { expiryDate: { [Op.lt]: today } } : undefined,
@@ -596,7 +597,7 @@ async function listTransactions({ query = {} }) {
   const { page, limit, offset } = getPagination(query);
 
   const where = combineWhere(
-    query.medicationId ? { medicationId: Number(query.medicationId) } : undefined,
+    query.medicationId ? { medicationId: query.medicationId } : undefined,
     query.transactionType ? { transactionType: query.transactionType } : undefined,
     query.referenceType ? { referenceType: query.referenceType } : undefined,
     query.from ? { performedAt: { [Op.gte]: new Date(query.from) } } : undefined,
