@@ -7,8 +7,22 @@
  */
 const env = require('./env');
 
-const ssl = env.DB_SSL ? { require: true, rejectUnauthorized: env.DB_SSL_REJECT_UNAUTHORIZED } : undefined;
 const connectionTimeoutMillis = env.DB_CONNECTION_TIMEOUT_MS || 30000;
+
+/**
+ * Optional self-signed CA (Aiven's `ca.pem`). When present we verify the chain
+ * ourselves and require `rejectUnauthorized`; otherwise the flag comes from
+ * `DB_SSL_REJECT_UNAUTHORIZED`.
+ */
+function buildSsl() {
+  if (!env.DB_SSL) return undefined;
+  const ca = process.env.DB_CA_CERT;
+  return {
+    require: true,
+    rejectUnauthorized: ca ? true : env.DB_SSL_REJECT_UNAUTHORIZED,
+    ...(ca ? { ca } : {}),
+  };
+}
 
 const shared = {
   dialect: 'postgres',
@@ -29,32 +43,40 @@ const shared = {
   },
 };
 
+/**
+ * The CLI constructs `new Sequelize(database, username, password, options)`, so
+ * it needs discrete `host`/`username`/`password` fields. Returning a `url` key
+ * instead makes it drop `dialect` and fail with
+ * "Dialect needs to be explicitly supplied as of v4.0.0".
+ */
 const connection = () => {
-  if (!env.database.databaseUrl) {
+  const dialectOptions = { connectionTimeoutMillis, keepAlive: true };
+  const ssl = buildSsl();
+  if (ssl) dialectOptions.ssl = ssl;
+
+  const source = env.database.databaseUrl;
+
+  if (!source) {
     return {
       host: env.database.host,
       port: env.database.port,
       database: env.database.name,
       username: env.database.username,
       password: env.database.password,
-      dialectOptions: ssl ? { ssl } : undefined,
+      dialectOptions,
     };
   }
 
-  // The CLI calls `new Sequelize(database, username, password, options)`, so a
-  // bare `url` is not enough: the credentials have to be present as fields too.
-  const parsed = new URL(process.env.DATABASE_URL);
+  const parsed = new URL(source);
+  const read = (value) => (value ? decodeURIComponent(value) : '');
 
-
-  for (const key of ['sslmode', 'ssl', 'sslcert', 'sslkey', 'sslrootcert']) parsed.searchParams.delete(key);
   return {
-    url: parsed.toString(),
     host: parsed.hostname,
     port: parsed.port ? Number(parsed.port) : 5432,
-    database: decodeURIComponent(parsed.pathname.replace(/^\//, '')),
-    username: decodeURIComponent(parsed.username),
-    password: decodeURIComponent(parsed.password),
-    dialectOptions: { connectionTimeoutMillis, keepAlive: true, ...(ssl ? { ssl } : {}) },
+    database: read(parsed.pathname.replace(/^\//, '')),
+    username: read(parsed.username),
+    password: read(parsed.password),
+    dialectOptions,
   };
 };
 

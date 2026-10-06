@@ -62,6 +62,9 @@ async function start() {
 if (require.main === module) {
   start().catch((error) => {
     logger.error('server.start_failed', { message: error.message, stack: error.stack });
+    // Render scrapes stdout/stderr, so mirror the failure there as well.
+    // eslint-disable-next-line no-console
+    console.error(`[fatal] server failed to start: ${error.message}\n${error.stack}`);
     process.exit(1);
   });
 }

@@ -50,9 +50,15 @@ for (const candidate of FRONTEND_ENV_CANDIDATES) {
   }
 }
 
+/**
+ * Accepts the usual boolean spellings plus sslmode-style values
+ * (`DB_SSL=require`), so a truthy-but-unlisted value cannot silently disable
+ * SSL. Everything except an explicit negative is treated as true.
+ */
 function parseBool(value, fallback = false) {
   if (value === undefined || value === '') return fallback;
-  return ['1', 'true', 'yes', 'on'].includes(String(value).toLowerCase());
+  const normalized = String(value).trim().toLowerCase();
+  return !['0', 'false', 'no', 'off'].includes(normalized);
 }
 
 function parseInt(value, fallback) {

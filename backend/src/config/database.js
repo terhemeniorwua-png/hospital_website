@@ -21,10 +21,12 @@ function normalizeUrl(rawUrl) {
  */
 function buildOptions(extra = {}) {
   const env = require('./env');
+  const ca = process.env.DB_CA_CERT;
   const ssl = env.DB_SSL
     ? {
         require: true,
-        rejectUnauthorized: env.DB_SSL_REJECT_UNAUTHORIZED,
+        rejectUnauthorized: ca ? true : env.DB_SSL_REJECT_UNAUTHORIZED,
+        ...(ca ? { ca } : {}),
       }
     : false;
 
@@ -65,14 +67,9 @@ function buildOptions(extra = {}) {
   };
 }
 
-// const options = buildOptions();
-const sequelize = process.env.DATABASE_URL
-  ? new Sequelize(process.env.DATABASE_URL, {
-      dialect: "postgres",
-      logging: false,
-      dialectOptions: { ssl: { require: true, rejectUnauthorized: false } },
-    })
-  : new Sequelize(/* your existing local config */);
+const { url, ...options } = buildOptions();
+const sequelize = url ? new Sequelize(url, options) : new Sequelize(options);
+
 /**
  * Verifies the connection, retrying transient network failures (cloud Postgres
  * providers occasionally drop a fresh connection) before giving up.
