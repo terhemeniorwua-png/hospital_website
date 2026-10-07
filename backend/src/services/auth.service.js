@@ -36,19 +36,24 @@ const sanitizeUser = (user) => ({
 });
 
 /** Issues an access/refresh pair and persists the hashed refresh token. */
-async function issueTokens(user, req) {
+async function issueTokens(user, req, transaction) {
   const accessToken = jwt.signAccessToken(user);
   const refreshToken = jwt.signRefreshToken(user);
   const decoded = jwt.verifyRefreshToken(refreshToken);
 
-  await RefreshToken.create({
+ await RefreshToken.create(
+  {
     userId: user.id,
     tokenHash: sha256(refreshToken),
     jti: decoded.jti,
-    expiresAt: new Date(Date.now() + jwt.refreshTokenTtlSeconds() * 1000),
+    expiresAt: new Date(
+      Date.now() + jwt.refreshTokenTtlSeconds() * 1000
+    ),
     userAgent: getUserAgent(req),
     ipAddress: getIp(req),
-  });
+  },
+  { transaction }
+);
 
   return { accessToken, refreshToken, expiresIn: jwt.refreshTokenTtlSeconds() };
 }
@@ -101,7 +106,7 @@ async function login({ email, password, req }) {
     lastLoginIp: getIp(req),
   });
 
-  const tokens = await issueTokens(user, req);
+const tokens = await issueTokens(user, req, transaction);
   return { user: sanitizeUser(user), ...tokens };
 }
 
@@ -154,7 +159,7 @@ async function registerPatient({ payload, req }) {
       { transaction },
     );
 
-    const tokens = await issueTokens(user, req);
+    const tokens = await issueTokens(user, req, transaction);
     return { user: sanitizeUser(user), patient, ...tokens };
   });
 }
