@@ -391,6 +391,19 @@ function resolvePatientId(user, requested) {
   return requested;
 }
 
+/**
+ * Ownership guard for appointment mutations.
+ *
+ * Mirrors `getById`: a PATIENT may only ever act on their own appointment.
+ * Without this, `appointments:update` would let any patient cancel or
+ * reschedule an arbitrary appointment by id.
+ */
+function assertOwnAppointment(user, appointment) {
+  if (roleNameOf(user) === 'PATIENT' && !sameId(appointment.patientId, user.patientId)) {
+    throw AppError.forbidden('You are not authorised to change this appointment');
+  }
+}
+
 async function recipientUserIds({ patientId, doctorUserId }) {
   const ids = [];
   if (doctorUserId) ids.push(doctorUserId);
@@ -434,6 +447,7 @@ const TRANSITIONS = {
 async function transition({ user, id, status, reason }) {
   const appointment = await Appointment.findByPk(id);
   if (!appointment) throw AppError.notFound('Appointment not found');
+  assertOwnAppointment(user, appointment);
 
   const allowed = TRANSITIONS[appointment.status] || [];
   if (!allowed.includes(status)) {
@@ -543,6 +557,7 @@ const markNoShow = ({ user, id, reason }) => transition({ user, id, status: APPO
 async function reschedule({ user, id, data }) {
   const appointment = await Appointment.findByPk(id);
   if (!appointment) throw AppError.notFound('Appointment not found');
+  assertOwnAppointment(user, appointment);
 
   if (!LIVE_STATUSES.includes(appointment.status)) {
     throw AppError.conflict(`A ${appointment.status.toLowerCase()} appointment cannot be rescheduled`);

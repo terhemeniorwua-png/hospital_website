@@ -6,7 +6,7 @@ const { sha256, randomToken } = require('../utils/codeGenerator');
 const jwt = require('../utils/jwt');
 const { getIp, getUserAgent } = require('../utils/requestInfo');
 const { roleNameOf } = require('../utils/accessControl');
-const { User, Role, Patient, RefreshToken, PasswordReset } = require('../models');
+const { User, Role, Patient, Doctor, RefreshToken, PasswordReset } = require('../models');
 const { USER_STATUS } = require('../config/constants');
 
 /**
@@ -308,6 +308,13 @@ async function me(userId) {
     include: [
       { model: Role, as: 'role' },
       { model: Patient, as: 'patient', attributes: ['id', 'hospitalNumber', 'firstName', 'lastName'] },
+      // The Doctor row is how a clinician identifies their own queue,
+      // appointments and patients; without it a DOCTOR has no doctorId.
+      {
+        model: Doctor,
+        as: 'doctorProfile',
+        attributes: ['id', 'specialization', 'subSpecialization', 'departmentId', 'isOnDuty', 'isAcceptingAppointments'],
+      },
     ],
   });
   if (!user) throw AppError.notFound('Account not found');
@@ -315,6 +322,7 @@ async function me(userId) {
   return {
     ...sanitizeUser(user),
     patient: user.patient || null,
+    doctorProfile: user.doctorProfile || null,
     permissions: roleNameOf(user) ? require('../config/permissions').ROLE_PERMISSIONS[roleNameOf(user)] : [],
   };
 }

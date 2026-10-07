@@ -256,6 +256,10 @@ const ROLE_PERMISSIONS = Object.freeze({
     P.MEDICAL_RECORD_READ,
     P.APPOINTMENT_CREATE,
     P.APPOINTMENT_READ,
+    // Lets a patient cancel or reschedule their own appointment. The service
+    // asserts ownership (appointment.service assertOwnAppointment), so this
+    // grants self-service only - never access to someone else's appointment.
+    P.APPOINTMENT_UPDATE,
     P.QUEUE_READ,
     P.CONSULTATION_READ,
     P.LAB_ORDER_READ,

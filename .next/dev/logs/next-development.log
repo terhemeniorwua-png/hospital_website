@@ -1,5 +1,1 @@
-{"timestamp":"00:00:04.054","source":"Server","level":"LOG","message":""}
-{"timestamp":"00:00:15.998","source":"Server","level":"LOG","message":"○ Compiling /register ..."}
-{"timestamp":"03:25:30.770","source":"Server","level":"ERROR","message":"TypeError: fetch failed"}
-{"timestamp":"03:25:34.564","source":"Server","level":"LOG","message":"○ Compiling /_error ..."}
-{"timestamp":"03:25:35.918","source":"Server","level":"ERROR","message":"TimeoutError: The operation was aborted due to timeout"}
+{"timestamp":"00:00:05.900","source":"Server","level":"LOG","message":""}
