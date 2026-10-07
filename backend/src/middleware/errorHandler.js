@@ -13,48 +13,118 @@ const notFound = (req, res) =>
   });
 
 /** Maps well-known library errors onto the standard envelope. */
+// function normalise(error) {
+
+
+//   if (error instanceof AppError) return error;
+
+//   if (error instanceof ValidationError) {
+//     return AppError.badRequest('Validation failed', {
+//       errors: (error.errors || []).map((e) => ({ field: e.path, message: e.message })),
+//     });
+//   }
+
+//   if (error instanceof UniqueConstraintError) {
+//     const details = (error.errors || []).map((e) => ({ field: e.path, message: e.message }));
+//     return AppError.conflict('A record with these details already exists', { errors: details });
+//   }
+
+// if (error && error.name === 'SequelizeForeignKeyConstraintError') {
+//   console.error('FK violation:', error.table, error.index, JSON.stringify(error.fields), error.parent && error.parent.detail);
+
+//     return AppError.badRequest('Referenced record does not exist or is still in use', {
+//       errors: [{ field: 'reference', message: error.message }],
+//     });
+// }
+
+//   if (error instanceof multer.MulterError) {
+//     const message =
+//       error.code === 'LIMIT_FILE_SIZE'
+//         ? `File exceeds the ${env.MAX_UPLOAD_SIZE_MB}MB limit`
+//         : `Upload failed: ${error.message}`;
+//     return AppError.badRequest(message, { errors: [{ field: 'file', message: error.message }] });
+//   }
+
+//   if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+//     return AppError.unauthorized('Invalid or expired authentication token');
+//   }
+
+//   if (error.type === 'entity.parse.failed') {
+//     return AppError.badRequest('Malformed JSON payload');
+//   }
+
+//   return null;
+// }
+
+// eslint-disable-next-line no-unused-vars
+
+
 function normalise(error) {
   if (error instanceof AppError) return error;
 
   if (error instanceof ValidationError) {
     return AppError.badRequest('Validation failed', {
-      errors: (error.errors || []).map((e) => ({ field: e.path, message: e.message })),
+      errors: (error.errors || []).map((e) => ({
+        field: e.path,
+        message: e.message,
+      })),
     });
   }
 
   if (error instanceof UniqueConstraintError) {
-    const details = (error.errors || []).map((e) => ({ field: e.path, message: e.message }));
-    return AppError.conflict('A record with these details already exists', { errors: details });
+    const details = (error.errors || []).map((e) => ({
+      field: e.path,
+      message: e.message,
+    }));
+
+    return AppError.conflict(
+      'A record with these details already exists',
+      { errors: details }
+    );
   }
 
-if (error && error.name === 'SequelizeForeignKeyConstraintError') {
-  console.error('FK violation:', error.table, error.index, JSON.stringify(error.fields), error.parent && error.parent.detail);
+  if (error && error.name === 'SequelizeForeignKeyConstraintError') {
+    console.error(
+      'FK violation:',
+      error.table,
+      error.index,
+      JSON.stringify(error.fields),
+      error.parent && error.parent.detail
+    );
 
-    return AppError.badRequest('Referenced record does not exist or is still in use', {
-      errors: [{ field: 'reference', message: error.message }],
-    });
-}
+    return AppError.badRequest(
+      'Referenced record does not exist or is still in use',
+      {
+        errors: [
+          {
+            field: 'reference',
+            message: error.message,
+          },
+        ],
+      }
+    );
+  }
 
   if (error instanceof multer.MulterError) {
     const message =
       error.code === 'LIMIT_FILE_SIZE'
         ? `File exceeds the ${env.MAX_UPLOAD_SIZE_MB}MB limit`
         : `Upload failed: ${error.message}`;
-    return AppError.badRequest(message, { errors: [{ field: 'file', message: error.message }] });
+
+    return AppError.badRequest(message, {
+      errors: [
+        {
+          field: 'file',
+          message: error.message,
+        },
+      ],
+    });
   }
 
-  if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-    return AppError.unauthorized('Invalid or expired authentication token');
-  }
-
-  if (error.type === 'entity.parse.failed') {
-    return AppError.badRequest('Malformed JSON payload');
-  }
-
-  return null;
+  // Continue with your JWT / JSON parsing handling...
 }
 
-// eslint-disable-next-line no-unused-vars
+
 function errorHandler(error, req, res, next) {
   const known = normalise(error);
   const appError = known || AppError.internal();
