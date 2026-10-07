@@ -29,11 +29,11 @@ function normalise(error) {
 
 if (error && error.name === 'SequelizeForeignKeyConstraintError') {
   console.error('FK violation:', error.table, error.index, JSON.stringify(error.fields), error.parent && error.parent.detail);
-}
+
     return AppError.badRequest('Referenced record does not exist or is still in use', {
       errors: [{ field: 'reference', message: error.message }],
     });
-  }
+}
 
   if (error instanceof multer.MulterError) {
     const message =
@@ -51,6 +51,8 @@ if (error && error.name === 'SequelizeForeignKeyConstraintError') {
     return AppError.badRequest('Malformed JSON payload');
   }
 
+  return null;
+}
 
 // eslint-disable-next-line no-unused-vars
 function errorHandler(error, req, res, next) {
