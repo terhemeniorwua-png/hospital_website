@@ -1,6 +1,20 @@
 const { Op, where, fn, col } = require('sequelize');
 
 /**
+ * `col()` emits a raw identifier, so it never passes through the model's
+ * `underscored` mapping - quoting `hospitalNumber` would ask Postgres for a
+ * literal `"hospitalNumber"` column and blow up. Every model in this project
+ * stores snake_case, so translate before handing the name to Sequelize.
+ * Already-snake_case and dotted (`patient.firstName`) references are handled.
+ */
+function sqlColumn(reference) {
+  return String(reference)
+    .split('.')
+    .map((part) => part.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`))
+    .join('.');
+}
+
+/**
  * Builds a case-insensitive `WHERE` fragment for `?search=`.
  * @param {Array<[string, string]>} fields pairs of [columnName, op]
  */
@@ -9,13 +23,13 @@ function searchWhere(search, fields) {
   const term = String(search).trim();
   if (!term) return undefined;
 
-  const parts = fields.map(([column, type = 'string'], index) => {
+  const parts = fields.map(([column, type = 'string']) => {
     if (type === 'number') {
       const value = Number(term);
       if (!Number.isFinite(value)) return null;
-      return fn('CAST', col(column), 'text').toLowerCase().like(`%${value}%`);
+      return fn('CAST', col(sqlColumn(column)), 'text').toLowerCase().like(`%${value}%`);
     }
-    return where(col(column), { [Op.iLike]: `%${term}%` });
+    return where(col(sqlColumn(column)), { [Op.iLike]: `%${term}%` });
   });
 
   const valid = parts.filter(Boolean);

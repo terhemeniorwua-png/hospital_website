@@ -267,7 +267,7 @@ async function getAdmission({ user, id }) {
 }
 
 async function nextAdmissionNumber({ transaction }) {
-  const last = await Admission.findOne({ order: [['id', 'DESC']], attributes: ['admissionNumber'], transaction });
+  const last = await Admission.findOne({ order: [['createdAt', 'DESC'], ['admissionNumber', 'DESC']], attributes: ['admissionNumber'], transaction });
   let sequence = 1;
   if (last && typeof last.admissionNumber === 'string') {
     const parsed = Number.parseInt(last.admissionNumber.split('-').pop(), 10);

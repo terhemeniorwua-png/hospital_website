@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { PageHeader, PageBody, PageSection, CtaStrip } from '../../../components/layout/PageShell';
 import { Card, DataTile } from '../../../components/ui/Card';
@@ -82,9 +83,9 @@ export default function DoctorProfilePage() {
           <Notice tone="warning" title="Consultant not found">
             <p>
               This profile is not in the scheduling system. It may have been retired or the link may be wrong.{' '}
-              <a href="/doctors" className="font-semibold underline">
+              <Link href="/doctors" className="font-semibold underline">
                 Browse all doctors
-              </a>
+              </Link>
               .
             </p>
           </Notice>
@@ -168,7 +169,7 @@ export default function DoctorProfilePage() {
                       </Notice>
                     ) : nextSlots.length === 0 ? (
                       <Notice tone="muted" title="No free slots on this date">
-                        <p>Try another date — this consultant's clinic is often fully booked a week ahead.</p>
+                        <p>Try another date — this consultant&apos;s clinic is often fully booked a week ahead.</p>
                       </Notice>
                     ) : (
                       <>

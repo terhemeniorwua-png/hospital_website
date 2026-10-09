@@ -121,7 +121,17 @@ function normalise(error) {
     });
   }
 
-  // Continue with your JWT / JSON parsing handling...
+  if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+    return AppError.unauthorized('Invalid or expired authentication token');
+  }
+
+  // Express 5 body-parser raises this for an unparseable JSON body; it must
+  // surface as 400, not fall through to the 500 catch-all.
+  if (error.type === 'entity.parse.failed' || (error instanceof SyntaxError && error.status === 400)) {
+    return AppError.badRequest('Malformed JSON payload');
+  }
+
+  return null;
 }
 
 

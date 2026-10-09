@@ -256,7 +256,10 @@ async function blockSlot({ doctorId, slotId, isBlocked, notes, actor }) {
 
 async function nextAppointmentNumber({ transaction }) {
   const last = await Appointment.findOne({
-    order: [['id', 'DESC']],
+    order: [
+      ['createdAt', 'DESC'],
+      ['appointmentNumber', 'DESC'],
+    ],
     attributes: ['appointmentNumber'],
     transaction,
   });
@@ -688,6 +691,7 @@ module.exports = {
   list,
   getById,
   book,
+  transition,
   confirm,
   checkIn,
   start,

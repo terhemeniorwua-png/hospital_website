@@ -37,7 +37,7 @@ const CLAIM_INCLUDES = [
 ];
 
 async function nextClaimNumber() {
-  const last = await InsuranceClaim.findOne({ order: [['id', 'DESC']], attributes: ['claimNumber'] });
+  const last = await InsuranceClaim.findOne({ order: [['createdAt', 'DESC'], ['claimNumber', 'DESC']], attributes: ['claimNumber'] });
   let sequence = 1;
   if (last && typeof last.claimNumber === 'string') {
     const parsed = Number.parseInt(last.claimNumber.split('-').pop(), 10);

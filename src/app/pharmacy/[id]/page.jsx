@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { PageHeader, PageBody, PageSection, CtaStrip } from '../../../components/layout/PageShell';
 import { Card, DetailRow } from '../../../components/ui/Card';
@@ -82,9 +83,9 @@ export default function MedicineDetailPage() {
           <Notice tone="warning" title="Not in the catalogue">
             <p>
               This preparation may have been discontinued or delisted.{' '}
-              <a href="/pharmacy" className="font-semibold underline">
+              <Link href="/pharmacy" className="font-semibold underline">
                 Browse the full catalogue
-              </a>
+              </Link>
               .
             </p>
           </Notice>

@@ -125,7 +125,7 @@ async function getById({ user, id }) {
 }
 
 async function nextConsultationNumber({ transaction }) {
-  const last = await Consultation.findOne({ order: [['id', 'DESC']], attributes: ['consultationNumber'], transaction });
+  const last = await Consultation.findOne({ order: [['createdAt', 'DESC'], ['consultationNumber', 'DESC']], attributes: ['consultationNumber'], transaction });
   let sequence = 1;
   if (last && typeof last.consultationNumber === 'string') {
     const parsed = Number.parseInt(last.consultationNumber.split('-').pop(), 10);

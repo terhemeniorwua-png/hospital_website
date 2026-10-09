@@ -102,7 +102,10 @@ const list = {
 const search = {
   query: z.object({
     ...paginationQuery,
+    // The service reads `search`; `q` is accepted as an alias so neither
+    // spelling is silently dropped by validation.
     q: optionalString(120),
+    search: optionalString(120),
     limit: z.coerce.number().int().min(1).max(50).optional(),
   }),
 };

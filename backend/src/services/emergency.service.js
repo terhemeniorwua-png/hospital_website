@@ -72,7 +72,7 @@ const CASE_INCLUDES = [
 ];
 
 async function nextCaseNumber({ transaction }) {
-  const last = await EmergencyCase.findOne({ order: [['id', 'DESC']], attributes: ['caseNumber'], transaction });
+  const last = await EmergencyCase.findOne({ order: [['createdAt', 'DESC'], ['caseNumber', 'DESC']], attributes: ['caseNumber'], transaction });
   let sequence = 1;
   if (last && typeof last.caseNumber === 'string') {
     const parsed = Number.parseInt(last.caseNumber.split('-').pop(), 10);
@@ -311,7 +311,7 @@ async function callNext({ user, data }) {
 async function recordVitals({ user, caseId, data }) {
   const emergencyCase = caseId
     ? await EmergencyCase.findByPk(caseId)
-    : await EmergencyCase.findOne({ where: { patientId: data.patientId }, order: [['id', 'DESC']] });
+    : await EmergencyCase.findOne({ where: { patientId: data.patientId }, order: [['createdAt', 'DESC']] });
   if (!emergencyCase) throw AppError.notFound('Emergency case not found');
 
   const vitals = await VitalSign.create({

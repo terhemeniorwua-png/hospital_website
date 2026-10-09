@@ -78,7 +78,7 @@ export default function QuickActions() {
               </Link>
             ))}
             <Link
-              href="/cart"
+              href="/pharmacy"
               className={cn(
                 'relative flex flex-col items-center gap-0.5 rounded-full px-3 py-1.5 text-[10px] font-semibold text-ink transition hover:bg-primary-50',
               )}

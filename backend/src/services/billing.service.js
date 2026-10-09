@@ -69,7 +69,7 @@ function present(invoice) {
 }
 
 async function nextInvoiceNumber({ transaction }) {
-  const last = await Invoice.findOne({ order: [['id', 'DESC']], attributes: ['invoiceNumber'], transaction });
+  const last = await Invoice.findOne({ order: [['createdAt', 'DESC'], ['invoiceNumber', 'DESC']], attributes: ['invoiceNumber'], transaction });
   let sequence = 1;
   if (last && typeof last.invoiceNumber === 'string') {
     const parsed = Number.parseInt(last.invoiceNumber.split('-').pop(), 10);
@@ -614,7 +614,7 @@ async function issue({ user, id }) {
  * ------------------------------------------------------------------ */
 
 async function nextPaymentNumber({ transaction }) {
-  const last = await Payment.findOne({ order: [['id', 'DESC']], attributes: ['paymentNumber'], transaction });
+  const last = await Payment.findOne({ order: [['createdAt', 'DESC'], ['paymentNumber', 'DESC']], attributes: ['paymentNumber'], transaction });
   let sequence = 1;
   if (last && typeof last.paymentNumber === 'string') {
     const parsed = Number.parseInt(last.paymentNumber.split('-').pop(), 10);

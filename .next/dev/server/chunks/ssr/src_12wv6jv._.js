@@ -4208,13 +4208,13 @@ function useAsync(fetcher, deps = [], { immediate = true, initialData = null } =
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useState"])(immediate);
     const mounted = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(true);
     const fetcherRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useRef"])(fetcher);
-    fetcherRef.current = fetcher;
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useEffect"])(()=>{
         mounted.current = true;
+        fetcherRef.current = fetcher;
         return ()=>{
             mounted.current = false;
         };
-    }, []);
+    });
     const run = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["useCallback"])(async ()=>{
         setLoading(true);
         setError(null);
@@ -4360,6 +4360,8 @@ __turbopack_context__.s([
     ()=>listAppointments,
     "listAvailableDoctors",
     ()=>listAvailableDoctors,
+    "rescheduleAppointment",
+    ()=>rescheduleAppointment,
     "resolveDoctorDepartment",
     ()=>resolveDoctorDepartment,
     "resolveDoctorDepartments",
@@ -4390,9 +4392,9 @@ const APPOINTMENT_TYPES = [
     }
 ];
 const APPOINTMENT_STATUS_META = {
-    SCHEDULED: {
-        label: 'Scheduled',
-        tone: 'primary'
+    REQUESTED: {
+        label: 'Requested',
+        tone: 'warning'
     },
     CONFIRMED: {
         label: 'Confirmed',
@@ -4402,8 +4404,12 @@ const APPOINTMENT_STATUS_META = {
         label: 'Checked in',
         tone: 'teal'
     },
-    IN_PROGRESS: {
-        label: 'In progress',
+    IN_QUEUE: {
+        label: 'In queue',
+        tone: 'primary'
+    },
+    IN_CONSULTATION: {
+        label: 'In consultation',
         tone: 'warning'
     },
     COMPLETED: {
@@ -4417,10 +4423,6 @@ const APPOINTMENT_STATUS_META = {
     NO_SHOW: {
         label: 'No-show',
         tone: 'danger'
-    },
-    RESCHEDULED: {
-        label: 'Rescheduled',
-        tone: 'muted'
     }
 };
 async function listAppointments(query) {
@@ -4456,6 +4458,9 @@ async function cancelAppointment(id, reason) {
     return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2f$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["api"].post(`/appointments/${id}/cancel`, {
         reason
     });
+}
+async function rescheduleAppointment(id, payload) {
+    return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2f$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["api"].put(`/appointments/${id}`, payload);
 }
 async function confirmAppointment(id, reason) {
     return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2f$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["api"].post(`/appointments/${id}/confirm`, {
@@ -4523,6 +4528,8 @@ async function resolveDoctorDepartment(doctorId) {
 __turbopack_context__.s([
     "MEDICATION_SORTS",
     ()=>MEDICATION_SORTS,
+    "PRESCRIPTION_STATUS_META",
+    ()=>PRESCRIPTION_STATUS_META,
     "PRICE_RANGES",
     ()=>PRICE_RANGES,
     "deriveCategories",
@@ -4546,6 +4553,32 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2f$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/api/client.js [app-ssr] (ecmascript)");
 ;
+const PRESCRIPTION_STATUS_META = {
+    DRAFT: {
+        label: 'Draft',
+        tone: 'muted'
+    },
+    PENDING_VERIFICATION: {
+        label: 'Awaiting verification',
+        tone: 'warning'
+    },
+    VERIFIED: {
+        label: 'Verified',
+        tone: 'primary'
+    },
+    PARTIALLY_DISPENSED: {
+        label: 'Partially dispensed',
+        tone: 'warning'
+    },
+    DISPENSED: {
+        label: 'Dispensed',
+        tone: 'success'
+    },
+    CANCELLED: {
+        label: 'Cancelled',
+        tone: 'danger'
+    }
+};
 async function listMedications(query) {
     return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2f$client$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["api"].get('/pharmacy/medications', {
         query

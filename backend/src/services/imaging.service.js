@@ -89,7 +89,7 @@ async function getById({ user, id }) {
 }
 
 async function nextOrderNumber({ transaction }) {
-  const last = await ImagingOrder.findOne({ order: [['id', 'DESC']], attributes: ['orderNumber'], transaction });
+  const last = await ImagingOrder.findOne({ order: [['createdAt', 'DESC'], ['orderNumber', 'DESC']], attributes: ['orderNumber'], transaction });
   let sequence = 1;
   if (last && typeof last.orderNumber === 'string') {
     const parsed = Number.parseInt(last.orderNumber.split('-').pop(), 10);

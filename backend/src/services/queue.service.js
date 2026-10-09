@@ -311,7 +311,9 @@ async function callNext({ user, departmentId, date, ticketNumber }) {
       include: [{ model: Patient, as: 'patient', attributes: ['id', 'firstName', 'lastName'] }],
       order: [[literal(PRIORITY_ORDER_SQL), 'ASC'], ['joinedAt', 'ASC']],
       transaction,
-      lock: transaction.LOCK.UPDATE,
+      // `of` keeps FOR UPDATE on the queue row: Postgres rejects locking the
+      // nullable side of the patient LEFT JOIN above.
+      lock: { level: transaction.LOCK.UPDATE, of: QueueEntry },
     });
 
     if (!candidates.length) throw AppError.conflict('There is nobody waiting in this queue');

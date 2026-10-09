@@ -135,7 +135,7 @@ async function listStaff({ departmentId, query = {} }) {
   const { page, limit, offset } = getPagination(query);
   const where = combineWhere(
     departmentId ? { departmentId: departmentId } : undefined,
-    searchWhere(query.search, [['userFirstName', 'string'], ['userLastName', 'string'], ['userEmail', 'string']]),
+    searchWhere(query.search, [['user.firstName', 'string'], ['user.lastName', 'string'], ['user.email', 'string']]),
   );
 
   const { rows, count } = await DepartmentStaff.findAndCountAll({

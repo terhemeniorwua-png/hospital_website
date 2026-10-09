@@ -144,7 +144,7 @@ async function searchDirectory({ user, query = {} }) {
   const where = combineWhere(
     scopePatientQuery(user),
     { status: { [Op.ne]: PATIENT_STATUS.DECEASED } },
-    searchWhere(query.search, [['hospitalNumber', 'string'], ['firstName', 'string'], ['lastName', 'string']]),
+    searchWhere(query.search || query.q, [['hospitalNumber', 'string'], ['firstName', 'string'], ['lastName', 'string']]),
   );
 
   const { rows, count } = await Patient.findAndCountAll({

@@ -66,7 +66,7 @@ async function resolveDoctor(user, doctorId) {
 }
 
 async function nextPrescriptionNumber({ transaction }) {
-  const last = await Prescription.findOne({ order: [['id', 'DESC']], attributes: ['prescriptionNumber'], transaction });
+  const last = await Prescription.findOne({ order: [['createdAt', 'DESC'], ['prescriptionNumber', 'DESC']], attributes: ['prescriptionNumber'], transaction });
   let sequence = 1;
   if (last && typeof last.prescriptionNumber === 'string') {
     const parsed = Number.parseInt(last.prescriptionNumber.split('-').pop(), 10);

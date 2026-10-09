@@ -12,14 +12,14 @@ export function useAsync(fetcher, deps = [], { immediate = true, initialData = n
   const [loading, setLoading] = useState(immediate);
   const mounted = useRef(true);
   const fetcherRef = useRef(fetcher);
-  fetcherRef.current = fetcher;
 
   useEffect(() => {
     mounted.current = true;
+    fetcherRef.current = fetcher;
     return () => {
       mounted.current = false;
     };
-  }, []);
+  });
 
   const run = useCallback(async () => {
     setLoading(true);

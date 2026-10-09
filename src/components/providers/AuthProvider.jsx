@@ -77,17 +77,32 @@ export function AuthProvider({ children }) {
 
   const signIn = useCallback(async (credentials) => {
     const data = await authService.login(credentials);
-    setUser(data.user);
+    // `POST /auth/login` returns only the sanitised account. Permissions,
+    // `patient` and `doctorProfile` come from `GET /auth/me`, which the portal
+    // gates on, so fetch it now rather than waiting for a page reload.
+    let account = data.user;
+    try {
+      account = (await authService.fetchCurrentUser()) || data.user;
+    } catch {
+      /* Keep the login payload if the follow-up fetch fails. */
+    }
+    setUser(account);
     setStatus('authenticated');
     setAuthModalOpen(false);
     setAuthModalReason(null);
-    return data.user;
+    return account;
   }, []);
 
   const register = useCallback(async (payload) => {
     const data = await authService.register(payload);
     if (data?.user) {
-      setUser(data.user);
+      let account = data.user;
+      try {
+        account = (await authService.fetchCurrentUser()) || data.user;
+      } catch {
+        /* Registration already succeeded; the profile can load on reload. */
+      }
+      setUser(account);
       setStatus('authenticated');
     }
     return data;

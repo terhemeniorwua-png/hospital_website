@@ -22,15 +22,16 @@ export const APPOINTMENT_TYPES = [
   { value: 'EMERGENCY', label: 'Urgent' },
 ];
 
+/** Mirrors `APPOINTMENT_STATUS` in backend/src/config/constants.js. */
 export const APPOINTMENT_STATUS_META = {
-  SCHEDULED: { label: 'Scheduled', tone: 'primary' },
+  REQUESTED: { label: 'Requested', tone: 'warning' },
   CONFIRMED: { label: 'Confirmed', tone: 'success' },
   CHECKED_IN: { label: 'Checked in', tone: 'teal' },
-  IN_PROGRESS: { label: 'In progress', tone: 'warning' },
+  IN_QUEUE: { label: 'In queue', tone: 'primary' },
+  IN_CONSULTATION: { label: 'In consultation', tone: 'warning' },
   COMPLETED: { label: 'Completed', tone: 'success' },
   CANCELLED: { label: 'Cancelled', tone: 'danger' },
   NO_SHOW: { label: 'No-show', tone: 'danger' },
-  RESCHEDULED: { label: 'Rescheduled', tone: 'muted' },
 };
 
 export async function listAppointments(query) {
@@ -59,6 +60,15 @@ export async function bookAppointment(payload) {
 
 export async function cancelAppointment(id, reason) {
   return api.post(`/appointments/${id}/cancel`, { reason });
+}
+
+/**
+ * Moves an existing appointment to a different slot. The backend validator
+ * demands the full rebooking context, not just a new time:
+ *   PUT /appointments/:id  { doctorId, departmentId, appointmentDate, slotId, startTime }
+ */
+export async function rescheduleAppointment(id, payload) {
+  return api.put(`/appointments/${id}`, payload);
 }
 
 export async function confirmAppointment(id, reason) {

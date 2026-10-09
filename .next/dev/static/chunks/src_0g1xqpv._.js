@@ -6146,17 +6146,17 @@ function useAsync(fetcher, deps = [], { immediate = true, initialData = null } =
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(immediate);
     const mounted = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(true);
     const fetcherRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(fetcher);
-    fetcherRef.current = fetcher;
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "useAsync.useEffect": ()=>{
             mounted.current = true;
+            fetcherRef.current = fetcher;
             return ({
                 "useAsync.useEffect": ()=>{
                     mounted.current = false;
                 }
             })["useAsync.useEffect"];
         }
-    }["useAsync.useEffect"], []);
+    }["useAsync.useEffect"]);
     const run = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "useAsync.useCallback[run]": async ()=>{
             setLoading(true);
@@ -6232,11 +6232,11 @@ _s1(useSubmit, "wJH55+SPJ07IJwqmt+4sih48E40=");
 function useDebounced(value, t0) {
     _s2();
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(5);
-    if ($[0] !== "49faa0e2571b64f3dc602084e17fbf10238c667208e5359af97a61f636d15578") {
+    if ($[0] !== "8ce371a3f920d3e604ee35d9e374bd4edc4596f4a9f0a9a14100e64f8d9c9a21") {
         for(let $i = 0; $i < 5; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "49faa0e2571b64f3dc602084e17fbf10238c667208e5359af97a61f636d15578";
+        $[0] = "8ce371a3f920d3e604ee35d9e374bd4edc4596f4a9f0a9a14100e64f8d9c9a21";
     }
     const delay = t0 === undefined ? 350 : t0;
     const [debounced, setDebounced] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(value);
@@ -6270,11 +6270,11 @@ _s2(useDebounced, "33bQBlXg6j7MFSTRBeGy5/ui5G8=");
 function useMediaQuery(query) {
     _s3();
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(4);
-    if ($[0] !== "49faa0e2571b64f3dc602084e17fbf10238c667208e5359af97a61f636d15578") {
+    if ($[0] !== "8ce371a3f920d3e604ee35d9e374bd4edc4596f4a9f0a9a14100e64f8d9c9a21") {
         for(let $i = 0; $i < 4; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "49faa0e2571b64f3dc602084e17fbf10238c667208e5359af97a61f636d15578";
+        $[0] = "8ce371a3f920d3e604ee35d9e374bd4edc4596f4a9f0a9a14100e64f8d9c9a21";
     }
     const [matches, setMatches] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     let t0;
@@ -6308,11 +6308,11 @@ _s3(useMediaQuery, "/aV7jSECvYA0Ea4uAEPK2AzROhs=");
 function useInView(t0) {
     _s4();
     const $ = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$next$40$16$2e$3$2e$3_$40$babel$2b$core$40$7$2e$29$2e$7_babel$2d$plugin$2d$react$2d$compiler$40$1$2e$0$2e$0_react$2d$dom$40$19$2e$2$2e$8_react$40$19$2e$2$2e$8_$5f$react$40$19$2e$2$2e$8$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$compiler$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["c"])(10);
-    if ($[0] !== "49faa0e2571b64f3dc602084e17fbf10238c667208e5359af97a61f636d15578") {
+    if ($[0] !== "8ce371a3f920d3e604ee35d9e374bd4edc4596f4a9f0a9a14100e64f8d9c9a21") {
         for(let $i = 0; $i < 10; $i += 1){
             $[$i] = Symbol.for("react.memo_cache_sentinel");
         }
-        $[0] = "49faa0e2571b64f3dc602084e17fbf10238c667208e5359af97a61f636d15578";
+        $[0] = "8ce371a3f920d3e604ee35d9e374bd4edc4596f4a9f0a9a14100e64f8d9c9a21";
     }
     let t1;
     if ($[1] !== t0) {
@@ -6418,6 +6418,8 @@ __turbopack_context__.s([
     ()=>listAppointments,
     "listAvailableDoctors",
     ()=>listAvailableDoctors,
+    "rescheduleAppointment",
+    ()=>rescheduleAppointment,
     "resolveDoctorDepartment",
     ()=>resolveDoctorDepartment,
     "resolveDoctorDepartments",
@@ -6448,9 +6450,9 @@ const APPOINTMENT_TYPES = [
     }
 ];
 const APPOINTMENT_STATUS_META = {
-    SCHEDULED: {
-        label: 'Scheduled',
-        tone: 'primary'
+    REQUESTED: {
+        label: 'Requested',
+        tone: 'warning'
     },
     CONFIRMED: {
         label: 'Confirmed',
@@ -6460,8 +6462,12 @@ const APPOINTMENT_STATUS_META = {
         label: 'Checked in',
         tone: 'teal'
     },
-    IN_PROGRESS: {
-        label: 'In progress',
+    IN_QUEUE: {
+        label: 'In queue',
+        tone: 'primary'
+    },
+    IN_CONSULTATION: {
+        label: 'In consultation',
         tone: 'warning'
     },
     COMPLETED: {
@@ -6475,10 +6481,6 @@ const APPOINTMENT_STATUS_META = {
     NO_SHOW: {
         label: 'No-show',
         tone: 'danger'
-    },
-    RESCHEDULED: {
-        label: 'Rescheduled',
-        tone: 'muted'
     }
 };
 async function listAppointments(query) {
@@ -6514,6 +6516,9 @@ async function cancelAppointment(id, reason) {
     return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2f$client$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["api"].post(`/appointments/${id}/cancel`, {
         reason
     });
+}
+async function rescheduleAppointment(id, payload) {
+    return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2f$client$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["api"].put(`/appointments/${id}`, payload);
 }
 async function confirmAppointment(id, reason) {
     return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2f$client$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["api"].post(`/appointments/${id}/confirm`, {
@@ -6626,6 +6631,8 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 __turbopack_context__.s([
     "MEDICATION_SORTS",
     ()=>MEDICATION_SORTS,
+    "PRESCRIPTION_STATUS_META",
+    ()=>PRESCRIPTION_STATUS_META,
     "PRICE_RANGES",
     ()=>PRICE_RANGES,
     "deriveCategories",
@@ -6649,6 +6656,32 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2f$client$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/api/client.js [app-client] (ecmascript)");
 ;
+const PRESCRIPTION_STATUS_META = {
+    DRAFT: {
+        label: 'Draft',
+        tone: 'muted'
+    },
+    PENDING_VERIFICATION: {
+        label: 'Awaiting verification',
+        tone: 'warning'
+    },
+    VERIFIED: {
+        label: 'Verified',
+        tone: 'primary'
+    },
+    PARTIALLY_DISPENSED: {
+        label: 'Partially dispensed',
+        tone: 'warning'
+    },
+    DISPENSED: {
+        label: 'Dispensed',
+        tone: 'success'
+    },
+    CANCELLED: {
+        label: 'Cancelled',
+        tone: 'danger'
+    }
+};
 async function listMedications(query) {
     return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$api$2f$client$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["api"].get('/pharmacy/medications', {
         query

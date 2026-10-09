@@ -168,12 +168,12 @@ export default function Navbar() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
-          <IconButton label="Search the site" className="hidden sm:inline-flex" onClick={() => (window.location.href = '/search')}>
+          <IconButton label="Find a doctor" className="hidden sm:inline-flex" onClick={() => (window.location.href = '/doctors')}>
             <IconSearch className="size-5" />
           </IconButton>
 
           <Link
-            href="/cart"
+            href="/pharmacy"
             aria-label={`Pharmacy basket, ${count} item${count === 1 ? '' : 's'}`}
             className="relative hidden size-10 place-items-center rounded-full text-ink transition hover:bg-primary-50 hover:text-primary-700 sm:grid"
           >
@@ -276,7 +276,7 @@ export default function Navbar() {
                 </Link>
               ),
             )}
-            <Link href="/cart" className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-ink hover:bg-primary-50">
+            <Link href="/pharmacy" className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-ink hover:bg-primary-50">
               <IconCart className="size-4" />
               Pharmacy basket
               {count > 0 ? <Badge tone="primary" size="sm">{count}</Badge> : null}

@@ -106,7 +106,8 @@ async function login({ email, password, req }) {
     lastLoginIp: getIp(req),
   });
 
-const tokens = await issueTokens(user, req, transaction);
+  // `login` runs outside any transaction, so no transaction is passed here.
+  const tokens = await issueTokens(user, req);
   return { user: sanitizeUser(user), ...tokens };
 }
 

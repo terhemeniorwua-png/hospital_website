@@ -16,6 +16,16 @@ import { api } from '../api/client';
  * GET /pharmacy/ -> the signed-in patient's prescriptions.
  */
 
+/** Mirrors `PRESCRIPTION_STATUS` in backend/src/config/constants.js. */
+export const PRESCRIPTION_STATUS_META = {
+  DRAFT: { label: 'Draft', tone: 'muted' },
+  PENDING_VERIFICATION: { label: 'Awaiting verification', tone: 'warning' },
+  VERIFIED: { label: 'Verified', tone: 'primary' },
+  PARTIALLY_DISPENSED: { label: 'Partially dispensed', tone: 'warning' },
+  DISPENSED: { label: 'Dispensed', tone: 'success' },
+  CANCELLED: { label: 'Cancelled', tone: 'danger' },
+};
+
 export async function listMedications(query) {
   return api.get('/pharmacy/medications', { query });
 }
